@@ -1,0 +1,34 @@
+spring:
+  redis:
+    database: 0
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    timeout: 60000
+  application:
+    name: MrktMkr
+
+logging:
+  level:
+    root: WARN
+
+    io.nkdtrdr.mrktmkr: DEBUG
+
+
+
+symbol:
+  base: BTC
+  quote: GBP
+  minimum-order: 10.10
+
+binance:
+  api-key: ${BINANCE_API_KEY}
+  api-secret: ${BINANCE_API_SECRET}
+
+strategy:
+  limits:
+    - strategy: BUY
+      asset: GBP
+      asset-cap: 50
+    - strategy: SELL
+      asset: BTC
+      asset-cap: 0.001

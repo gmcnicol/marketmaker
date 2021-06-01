@@ -1,0 +1,39 @@
+package io.nkdtrdr.mrktmkr.strategy.sell;
+
+import com.binance.api.client.domain.OrderSide;
+import com.binance.api.client.domain.OrderStatus;
+import com.binance.api.client.domain.event.OrderTradeUpdateEvent;
+import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
+import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
+import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
+import io.nkdtrdr.mrktmkr.strategy.StrategyFacade;
+import org.springframework.stereotype.Component;
+
+import java.util.function.Consumer;
+
+@Component
+public class SellOrderCancelledEventProcessor implements EventProcessor {
+    private final StrategyFacade strategyFacade;
+
+    public SellOrderCancelledEventProcessor(final StrategyFacade strategyFacade) {
+        this.strategyFacade = strategyFacade;
+    }
+
+    @Override
+    public boolean shouldProcessEventName(final String eventName) {
+        return "USER_TRADE_UPDATED".equals(eventName);
+    }
+
+    @Override
+    public void process(final MakerEvent makerEvent, final Consumer<EventEnvelope> resultHandler) {
+        final OrderTradeUpdateEvent orderTradeUpdateEvent = (OrderTradeUpdateEvent) makerEvent.getEventEnvelope().getPayload();
+        final OrderStatus orderStatus = orderTradeUpdateEvent.getOrderStatus();
+        if (!orderStatus.equals(OrderStatus.CANCELED))
+            return;
+
+        final OrderSide side = orderTradeUpdateEvent.getSide();
+        if (side.equals(OrderSide.SELL)) {
+            strategyFacade.placeInitialOrder();
+        }
+    }
+}
