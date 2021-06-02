@@ -30,6 +30,7 @@ public class BuyStrategy implements KdTradingStrategy {
     private final String name;
     private final Map<String, KdValue> previousKdValue = new HashMap<>();
     private final Predicate<KdValue> longSymbolMatches;
+    private final Predicate<KdValue> symbolMatches;
     private boolean canBeActivated;
     private boolean canPlaceABuy;
     private StrategyMediator mediator;
@@ -47,10 +48,9 @@ public class BuyStrategy implements KdTradingStrategy {
         Predicate<KdValue> dLessThanSeventy = kdValue -> kdValue.getdValue().compareTo(SEVENTY) < 0;
 
         Predicate<KdValue> dLessThanThirty = kdValue -> kdValue.getdValue().compareTo(valueOf(30L)) <= 0;
-        Predicate<KdValue> symbolMatches =
-                kdValue -> kdValue.getSymbol().equals("BTCGBP") && kdValue.getInterval().equals("1m");
+        symbolMatches = kdValue -> kdValue.getSymbol().equals("BTCGBP") && kdValue.getInterval().equals("1m");
 
-        longSymbolMatches = kdValue -> kdValue.getSymbol().equals("BTCGBP") && kdValue.getInterval().equals("5m");
+        longSymbolMatches = kdValue -> kdValue.getSymbol().equals("BTCGBP") && kdValue.getInterval().equals("1m");
         Predicate<KdValue> kGreaterThanD = value -> value.getkValue().compareTo(value.getdValue()) >= 0;
 
         Predicate<KdValue> previousKWasLessThanPreviousD = this::previousKLessThanPreviousD;
@@ -74,7 +74,7 @@ public class BuyStrategy implements KdTradingStrategy {
         canBeActivated =
                 getLastValue(value) != null && (longSymbolMatches.test(value) && activatePredicate.test(value));
         canPlaceABuy =
-                getLastValue(value) != null && (!longSymbolMatches.test(value) && canPlaceOrderPredicate.test(value));
+                getLastValue(value) != null && (symbolMatches.test(value) && canPlaceOrderPredicate.test(value));
         setLastValue(value);
     }
 

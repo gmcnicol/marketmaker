@@ -49,7 +49,8 @@ public class SellStrategy implements KdTradingStrategy {
                 kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(
                 "1m");
 
-        longSymbolMatches = kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("5m");
+        longSymbolMatches =
+                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("1m");
 
         Predicate<KdValue> lastKGreaterThanLastD = this::previousKGreaterThanPreviousD;
 

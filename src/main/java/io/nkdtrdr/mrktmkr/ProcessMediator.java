@@ -84,7 +84,7 @@ public class ProcessMediator {
         persistenceFacade.getAllOrders().forEach(ordersFacade::addOrderToBeTriggered);
         restClient.startUserStream();
         restClient.getAccount();
-        restClient.getCandleStick(symbol.getSymbol().toUpperCase(Locale.ROOT), CandlestickInterval.FIVE_MINUTES);
+        //restClient.getCandleStick(symbol.getSymbol().toUpperCase(Locale.ROOT), CandlestickInterval.FIVE_MINUTES);
         restClient.getCandleStick(symbol.getSymbol().toUpperCase(), CandlestickInterval.ONE_MINUTE);
     }
 
