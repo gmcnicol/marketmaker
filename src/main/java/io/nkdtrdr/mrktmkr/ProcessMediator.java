@@ -15,6 +15,7 @@ import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import io.nkdtrdr.mrktmkr.dto.CandleStickDTO;
 import io.nkdtrdr.mrktmkr.dto.CandleStickInitialisedEvent;
 import io.nkdtrdr.mrktmkr.dto.Order;
+import io.nkdtrdr.mrktmkr.monitoring.Monitor;
 import io.nkdtrdr.mrktmkr.orderbook.OrderBookRepository;
 import io.nkdtrdr.mrktmkr.orders.BinanceOrderFactory;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PreDestroy;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -57,19 +60,24 @@ public class ProcessMediator {
     private final PersistenceFacade persistenceFacade;
     private final OrdersFacade ordersFacade;
     private final Symbol symbol;
+    private final Monitor monitor;
     private Disruptor<MakerEvent> disruptor;
     private String listenKey;
 
     public ProcessMediator(RestClientAdapter restClient,
                            WebsocketAdapter websocketAdapter,
                            OrderBookRepository orderBookRepository,
-                           ModelMapper modelMapper, final PersistenceFacade persistenceFacade,
-                           @Lazy OrdersFacade ordersFacade, final Symbol symbol) {
+                           ModelMapper modelMapper,
+                           final PersistenceFacade persistenceFacade,
+                           @Lazy OrdersFacade ordersFacade,
+                           final Symbol symbol,
+                           final Monitor monitor) {
         this.restClient = restClient;
         this.modelMapper = modelMapper;
         this.persistenceFacade = persistenceFacade;
         this.ordersFacade = ordersFacade;
         this.symbol = symbol;
+        this.monitor = monitor;
         this.restClient.setProcessMediator(this);
 
         this.websocketAdapter = websocketAdapter;
@@ -116,6 +124,15 @@ public class ProcessMediator {
         this.listenKey = listenKey;
         websocketAdapter.startUserFeed(listenKey);
         websocketAdapter.startMarketFeed(symbol.getSymbol().toLowerCase(Locale.ROOT));
+    }
+
+    @Scheduled(cron = "30 0/5 * * * *")
+    public void monitor() {
+        final long minutes =
+                Duration.ofMillis(Instant.now().minusMillis(monitor.getLastTickerUpdate()).toEpochMilli()).toMinutes();
+        if (minutes >= 2) {
+            System.exit(-1);
+        }
     }
 
     @Scheduled(cron = "25 7/30 * * * *")
@@ -210,5 +227,9 @@ public class ProcessMediator {
 
     public void cancelOrder(final String orderId, final String symbol) {
         restClient.cancelOrder(symbol, orderId);
+    }
+
+    public void setLastTickerUpdate(final long lastTickerUpdate) {
+        monitor.setLastTickerUpdate(lastTickerUpdate);
     }
 }

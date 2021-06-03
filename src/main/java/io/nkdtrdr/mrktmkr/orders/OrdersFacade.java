@@ -129,4 +129,8 @@ public class OrdersFacade {
     public boolean strategyHasTrigger(final String strategy) {
         return ordersMediator.strategyHasTrigger(strategy);
     }
+
+    public void setLastTickerUpdate(final long lastTickerUpdate) {
+        processMediator.setLastTickerUpdate(lastTickerUpdate);
+    }
 }

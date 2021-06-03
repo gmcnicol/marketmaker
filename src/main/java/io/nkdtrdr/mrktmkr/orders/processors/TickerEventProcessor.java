@@ -7,8 +7,12 @@ import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import static java.time.LocalDateTime.now;
+
 
 @Component
 public class TickerEventProcessor implements EventProcessor {
@@ -32,5 +36,6 @@ public class TickerEventProcessor implements EventProcessor {
 
         ordersFacade.setBestAskPrice(tickersEvent.getBestAskPrice(), resultHandler);
         ordersFacade.setBestBidPrice(tickersEvent.getBestBidPrice(), resultHandler);
+        ordersFacade.setLastTickerUpdate(Instant.now().toEpochMilli());
     }
 }
