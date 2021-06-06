@@ -1,6 +1,5 @@
-package io.nkdtrdr.mrktmkr.strategy.buy;
+package io.nkdtrdr.mrktmkr.strategy;
 
-import com.binance.api.client.domain.OrderSide;
 import com.binance.api.client.domain.OrderStatus;
 import com.binance.api.client.domain.event.OrderTradeUpdateEvent;
 import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
@@ -11,11 +10,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
-public class BuyOrderCancelledEventProcessor implements EventProcessor {
+public class InitialOrderCancelledEventProcessor implements EventProcessor {
     private final StrategyFacade strategyFacade;
 
-    public BuyOrderCancelledEventProcessor(final StrategyFacade strategyFacade) {
+    public InitialOrderCancelledEventProcessor(final StrategyFacade strategyFacade) {
         this.strategyFacade = strategyFacade;
     }
 
@@ -26,14 +26,10 @@ public class BuyOrderCancelledEventProcessor implements EventProcessor {
 
     @Override
     public void process(final MakerEvent makerEvent, final Consumer<EventEnvelope> resultHandler) {
-        final OrderTradeUpdateEvent orderTradeUpdateEvent = (OrderTradeUpdateEvent) makerEvent.getEventEnvelope().getPayload();
+        final OrderTradeUpdateEvent orderTradeUpdateEvent =
+                (OrderTradeUpdateEvent) makerEvent.getEventEnvelope().getPayload();
         final OrderStatus orderStatus = orderTradeUpdateEvent.getOrderStatus();
-        if (!orderStatus.equals(OrderStatus.CANCELED))
-            return;
-
-        final OrderSide side = orderTradeUpdateEvent.getSide();
-        if (side.equals(OrderSide.BUY)) {
+        if (orderStatus.equals(OrderStatus.CANCELED))
             strategyFacade.placeInitialOrder();
-        }
     }
 }

@@ -28,10 +28,6 @@ public class StrategyFacade {
                         .withPayload(s.getName())
                         .build())
                 .forEach(callback);
-
-        if (strategyMediator.canTrade()) {
-            strategyMediator.placeInitialOrder();
-        }
     }
 
     public void processInitialKDValue(final List<KdValue> kdValues, final Consumer<EventEnvelope> callback) {
@@ -40,5 +36,13 @@ public class StrategyFacade {
 
     public void placeInitialOrder() {
         strategyMediator.placeInitialOrder();
+    }
+
+    public void setActiveTradingStrategy(final String strategyName) {
+        strategyMediator.setActiveTradingStrategy(strategyName);
+    }
+
+    public boolean canActivateStrategy(final String candidateStrategy) {
+        return strategyMediator.canActivateStrategy(candidateStrategy);
     }
 }

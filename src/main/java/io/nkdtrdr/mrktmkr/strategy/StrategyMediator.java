@@ -27,16 +27,19 @@ public class StrategyMediator {
     private final AccountFacade accountFacade;
     private final Symbol symbol;
     private final LimitsRepository limitsRepository;
+    private final ActivationTracker activationTracker;
 
     public StrategyMediator(final TradingStrategyRepository<KdValue> tradingStrategyRepository,
                             final OrdersFacade ordersFacade,
                             final AccountFacade accountFacade,
                             final TriggersFacade triggersFacade,
                             final Symbol symbol,
-                            final LimitsRepository limitsRepository) {
+                            final LimitsRepository limitsRepository,
+                            final ActivationTracker activationTracker) {
         this.symbol = symbol;
         this.tradingStrategyRepository = tradingStrategyRepository;
         this.limitsRepository = limitsRepository;
+        this.activationTracker = activationTracker;
         tradingStrategyRepository.all().forEach(ts -> ts.setMediator(this));
         this.ordersFacade = ordersFacade;
         this.accountFacade = accountFacade;
@@ -45,11 +48,11 @@ public class StrategyMediator {
     }
 
     public void setActiveTradingStrategy(String strategyName) {
-        if (activeTradingStrategy.getName().equals(strategyName)) {
-            return;
+        activationTracker.setCandidateStrategy(strategyName);
+        if (activationTracker.canActivateStrategy(strategyName)) {
+            this.activeTradingStrategy.setInnerStrategy((KdTradingStrategy) tradingStrategyRepository.strategyByName(
+                    strategyName));
         }
-        this.activeTradingStrategy.setInnerStrategy((KdTradingStrategy) tradingStrategyRepository.strategyByName(
-                strategyName));
     }
 
     public void placeInitialOrder() {
@@ -96,10 +99,6 @@ public class StrategyMediator {
             ordersFacade.placeOrder(order);
     }
 
-    public boolean canTrade() {
-        return activeTradingStrategy.canTrade();
-    }
-
     public BigDecimal getFreeBalanceForAsset(String asset) {
         return accountFacade.getFreeBalanceForAsset(asset);
     }
@@ -108,15 +107,11 @@ public class StrategyMediator {
         return tradingStrategyRepository.all();
     }
 
-    public String getBaseSymbol() {
-        return symbol.getBaseSymbol();
-    }
-
-    public String getQuoteSymbol() {
-        return symbol.getQuoteSymbol();
-    }
-
     public String getSymbol() {
         return symbol.getSymbol();
+    }
+
+    public boolean canActivateStrategy(final String candidateStrategy) {
+        return activationTracker.canActivateStrategy(candidateStrategy);
     }
 }

@@ -24,10 +24,7 @@ import io.nkdtrdr.mrktmkr.persistence.processors.PersistedOrderFilledProcessor;
 import io.nkdtrdr.mrktmkr.persistence.processors.PersistenceOrderRequestedHandler;
 import io.nkdtrdr.mrktmkr.strategy.KdValuesInitialisedProcessor;
 import io.nkdtrdr.mrktmkr.strategy.StrategyEventProcessor;
-import io.nkdtrdr.mrktmkr.strategy.buy.BuyOrderCancelledEventProcessor;
-import io.nkdtrdr.mrktmkr.strategy.buy.BuyStrategyTriggeredEventProcessor;
-import io.nkdtrdr.mrktmkr.strategy.sell.SellOrderCancelledEventProcessor;
-import io.nkdtrdr.mrktmkr.strategy.sell.SellStrategyTriggeredEventProcessor;
+import io.nkdtrdr.mrktmkr.strategy.InitialOrderCancelledEventProcessor;
 import io.nkdtrdr.mrktmkr.triggers.processors.OrderUpdateEventProcessor;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +39,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Configuration
 public class DisruptorFactory {
-    public static final int RING_BUFFER_SIZE = 512;
+    public static final int RING_BUFFER_SIZE = 128;
     private static final Logger LOGGER = getLogger(DisruptorFactory.class);
 
     private static final Set<String> EXCLUDED = new HashSet<>(Set.of("ORDER_REQUESTED", "CANDLE_STICK_UPDATED",
@@ -73,11 +70,8 @@ public class DisruptorFactory {
                                               TickerEventProcessor tickerEventProcessor,
                                               TriggeredOrderCancelledEventProcessor triggeredOrderCancelledEventProcessor,
                                               TriggeredOrderCompleteEventProcessor triggeredOrderCompleteEventProcessor,
-                                              BuyOrderCancelledEventProcessor buyOrderCancelledEventProcessor,
-                                              BuyStrategyTriggeredEventProcessor buyStrategyTriggeredEventProcessor,
+                                              InitialOrderCancelledEventProcessor initialOrderCancelledEventProcessor,
                                               CancelOrderEventProcessor cancelOrderEventProcessor,
-                                              SellOrderCancelledEventProcessor sellOrderCancelledEventProcessor,
-                                              SellStrategyTriggeredEventProcessor sellStrategyTriggeredEventProcessor,
                                               OrderUpdateEventProcessor orderUpdateEventProcessor,
                                               KdValuesInitialisedProcessor kdValuesInitialisedProcessor,
                                               PersistedOrderFilledProcessor persistedOrderFilledProcessor,
@@ -109,12 +103,9 @@ public class DisruptorFactory {
                 .then(getHasThrownEventHandler(triggeredOrderCompleteEventProcessor),
                         getHasThrownEventHandler(persistedOrderFilledProcessor))
                 .then(
-                        getHasThrownEventHandler(buyOrderCancelledEventProcessor),
-                        getHasThrownEventHandler(sellOrderCancelledEventProcessor))
+                        getHasThrownEventHandler(initialOrderCancelledEventProcessor)
+                        )
                 .then(getHasThrownEventHandler(orderUpdateEventProcessor))
-                .then(
-                        getHasThrownEventHandler(buyStrategyTriggeredEventProcessor),
-                        getHasThrownEventHandler(sellStrategyTriggeredEventProcessor))
                 .then(publisherHandler)
                 .then(((makerEvent, l, b) -> {
                     if (makerEvent.hasThrown()) {
