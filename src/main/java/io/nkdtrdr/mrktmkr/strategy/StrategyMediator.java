@@ -114,4 +114,8 @@ public class StrategyMediator {
     public boolean canActivateStrategy(final String candidateStrategy) {
         return activationTracker.canActivateStrategy(candidateStrategy);
     }
+
+    public boolean currentStrategyCanTrade() {
+        return activeTradingStrategy.canTrade();
+    }
 }

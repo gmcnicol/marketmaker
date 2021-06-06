@@ -28,6 +28,9 @@ public class StrategyFacade {
                         .withPayload(s.getName())
                         .build())
                 .forEach(callback);
+
+        if (strategyMediator.currentStrategyCanTrade())
+            strategyMediator.placeInitialOrder();
     }
 
     public void processInitialKDValue(final List<KdValue> kdValues, final Consumer<EventEnvelope> callback) {
