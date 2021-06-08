@@ -3,13 +3,13 @@ package io.nkdtrdr.mrktmkr;
 import com.binance.api.client.BinanceApiAsyncRestClient;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.domain.account.NewOrder;
-import com.binance.api.client.domain.account.NewOrderResponse;
 import com.binance.api.client.domain.account.Order;
 import com.binance.api.client.domain.account.request.CancelOrderRequest;
 import com.binance.api.client.domain.account.request.CancelOrderResponse;
 import com.binance.api.client.domain.account.request.OrderRequest;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.domain.market.OrderBook;
+import io.nkdtrdr.mrktmkr.symbols.Symbol;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+
 
 @Component
 public class RestClientAdapter {
@@ -63,20 +64,21 @@ public class RestClientAdapter {
 
     public void placeOrder(NewOrder newOrder) {
         try {
-            final NewOrderResponse newOrderResponse = syncClient.newOrder(newOrder);
-            processMediator.processEvent("NEW_ORDER_PLACED", newOrderResponse);
+            restClient.newOrder(newOrder,
+                    newOrderResponse -> processMediator.processEvent("NEW_ORDER_PLACED", newOrderResponse));
         } catch (Exception e) {
-            LOGGER.warn("NEW ORDER {}FAIL  {} ", newOrder.getNewClientOrderId(), getRootCauseMessage(e));
+            LOGGER.warn("NEW ORDER {} FAIL  {} ", newOrder.getNewClientOrderId(), getRootCauseMessage(e));
         }
     }
 
     public void cancelOrder(String symbol, String orderId) {
         try {
-            final CancelOrderResponse cancelOrderResponse = syncClient.cancelOrder(new CancelOrderRequest(symbol.toUpperCase(
-                    Locale.ROOT), orderId));
+            final CancelOrderResponse cancelOrderResponse =
+                    syncClient.cancelOrder(new CancelOrderRequest(symbol.toUpperCase(
+                            Locale.ROOT), orderId));
             processMediator.processEvent("ORDER_CANCELLED", cancelOrderResponse);
         } catch (Exception e) {
-         //   LOGGER.warn("CANCEL ORDER {} FAIL {} ", orderId, getRootCauseMessage(e));
+            //   LOGGER.warn("CANCEL ORDER {} FAIL {} ", orderId, getRootCauseMessage(e));
         }
     }
 
@@ -93,4 +95,10 @@ public class RestClientAdapter {
                         interval,
                         candlesticks));
     }
+
+    public void getSymbolStats(Symbol symbol){
+        restClient.get24HrPriceStatistics(symbol.getSymbol(),
+                tickerStatistics -> processMediator.processEvent("SYMBOL_STATS_UPDATED", tickerStatistics));
+    }
+
 }

@@ -1,9 +1,10 @@
-package io.nkdtrdr.mrktmkr.strategy;
+package io.nkdtrdr.mrktmkr.strategy.processors;
 
 import io.nkdtrdr.mrktmkr.analysis.model.KdValue;
 import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
+import io.nkdtrdr.mrktmkr.strategy.StrategyFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

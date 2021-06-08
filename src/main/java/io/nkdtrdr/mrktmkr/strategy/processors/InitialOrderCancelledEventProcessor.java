@@ -1,4 +1,4 @@
-package io.nkdtrdr.mrktmkr.strategy;
+package io.nkdtrdr.mrktmkr.strategy.processors;
 
 import com.binance.api.client.domain.OrderStatus;
 import com.binance.api.client.domain.event.OrderTradeUpdateEvent;

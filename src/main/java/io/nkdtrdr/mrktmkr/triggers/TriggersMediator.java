@@ -2,14 +2,12 @@ package io.nkdtrdr.mrktmkr.triggers;
 
 import io.nkdtrdr.mrktmkr.account.AccountFacade;
 import io.nkdtrdr.mrktmkr.dto.Order;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static io.nkdtrdr.mrktmkr.utilities.DateUtils.formattedDateString;
@@ -28,48 +26,78 @@ public class TriggersMediator {
     }
 
     public Collection<Order> getTriggersForOrder(Order order) {
+        final HashSet<Order> orders = new HashSet<>(2);
         if (order.getValue().compareTo(MINIMUM_ORDER) > 0) {
-            if (order.getSide().equals(Order.OrderSide.BUY)) {
-                order.setStrategy("BUY");
-                final BigDecimal buyCommission =
-                        ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
-
-                final BigDecimal netQuantity =
-                        order.getQuantity().multiply(buyCommission).setScale(6, RoundingMode.FLOOR);
-
-                final BigDecimal saleCommission = ONE.add(getSaleCommission());
-                final BigDecimal margin = valueOf(1.0003);
-                final BigDecimal adjustedValue = order.getValue().multiply(saleCommission).multiply(margin);
-                final BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
-                order.setOrderTrigger(Order.OrderTrigger.PRICE);
-                order.setPrice(price);
-                order.setQuantity(netQuantity);
-                order.setSide(Order.OrderSide.SELL);
-                order.setOrderId("FSELL" + formattedDateString(now()));
-                return Set.of(order);
-            } else if (order.getSide().equals(Order.OrderSide.SELL)) {
-                order.setStrategy("SELL");
-                final BigDecimal saleCommission = ONE.subtract(getSaleCommission());
-                final BigDecimal netValue = order.getValue().multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
-
-                final BigDecimal buyCommission = ONE.add(getBuyCommission());
-                final BigDecimal grossQuantity = order.getQuantity().multiply(buyCommission).setScale(6,
-                        RoundingMode.CEILING);
-
-                final BigDecimal margin = valueOf(0.9997);
-                final BigDecimal newValue = netValue.multiply(margin);
-                final BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
-
-                order.setOrderTrigger(Order.OrderTrigger.PRICE);
-                order.setPrice(newPrice);
-                order.setQuantity(grossQuantity);
-                order.setSide(Order.OrderSide.BUY);
-                order.setOrderId("FBUY" + formattedDateString(now()));
-                return Set.of(order);
-            }
+            orders.addAll(getFollowupSales(order));
+            orders.addAll(getFollowupBuys(order));
         }
+        return orders;
+    }
 
-        return Collections.emptySet();
+    private Set<Order> getFollowupBuys(final Order order) {
+        if (order.getSide().equals(Order.OrderSide.SELL)) {
+            order.setStrategy("SELL");
+            final BigDecimal saleCommission = ONE.subtract(getSaleCommission());
+            final BigDecimal netValue =
+                    order.getValue().multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
+
+            final BigDecimal buyCommission = ONE.add(getBuyCommission());
+            final BigDecimal grossQuantity = order.getQuantity().multiply(buyCommission).setScale(6,
+                    RoundingMode.CEILING);
+
+            BigDecimal margin = valueOf(0.9997);
+            BigDecimal newValue = netValue.multiply(margin);
+            BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
+
+            final Order.Builder orderBuilder = Order.newBuilder(order);
+            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
+            orderBuilder.setPrice(newPrice);
+            orderBuilder.setQuantity(grossQuantity);
+            orderBuilder.setSide(Order.OrderSide.BUY);
+            orderBuilder.setOrderId("FBUY" + formattedDateString(now()));
+            final Order targetOrder = orderBuilder.build();
+
+            margin = valueOf(1.0003);
+            newValue = netValue.multiply(margin);
+            newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
+            orderBuilder.setPrice(newPrice);
+
+            final Order bailOrder = orderBuilder.build();
+            return Set.of(targetOrder, bailOrder);
+        }
+        return Set.of();
+    }
+
+    private Set<Order> getFollowupSales(final Order order) {
+        if (order.getSide().equals(Order.OrderSide.BUY)) {
+            order.setStrategy("BUY");
+            final BigDecimal buyCommission =
+                    ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
+
+            final BigDecimal netQuantity =
+                    order.getQuantity().multiply(buyCommission).setScale(6, RoundingMode.FLOOR);
+
+            final BigDecimal saleCommission = ONE.add(getSaleCommission());
+            BigDecimal margin = valueOf(1.0003);
+            BigDecimal adjustedValue = order.getValue().multiply(saleCommission).multiply(margin);
+            BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
+
+            final Order.Builder orderBuilder = Order.newBuilder(order);
+            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
+            orderBuilder.setPrice(price);
+            orderBuilder.setQuantity(netQuantity);
+            orderBuilder.setSide(Order.OrderSide.SELL);
+            orderBuilder.setOrderId("FSELL" + formattedDateString(now()));
+            final Order targetOrder = orderBuilder.build();
+
+            margin = valueOf(0.9997);
+            adjustedValue = order.getValue().multiply(saleCommission).multiply(margin);
+            price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
+            orderBuilder.setPrice(price);
+            final Order bailOrder = orderBuilder.build();
+            return Set.of(targetOrder, bailOrder);
+        }
+        return Set.of();
     }
 
     private BigDecimal getSaleCommission() {

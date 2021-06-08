@@ -22,9 +22,9 @@ import io.nkdtrdr.mrktmkr.orders.processors.TriggeredOrderCancelledEventProcesso
 import io.nkdtrdr.mrktmkr.orders.processors.TriggeredOrderCompleteEventProcessor;
 import io.nkdtrdr.mrktmkr.persistence.processors.PersistedOrderFilledProcessor;
 import io.nkdtrdr.mrktmkr.persistence.processors.PersistenceOrderRequestedHandler;
-import io.nkdtrdr.mrktmkr.strategy.KdValuesInitialisedProcessor;
-import io.nkdtrdr.mrktmkr.strategy.StrategyEventProcessor;
-import io.nkdtrdr.mrktmkr.strategy.InitialOrderCancelledEventProcessor;
+import io.nkdtrdr.mrktmkr.strategy.processors.KdValuesInitialisedProcessor;
+import io.nkdtrdr.mrktmkr.strategy.processors.StrategyEventProcessor;
+import io.nkdtrdr.mrktmkr.strategy.processors.InitialOrderCancelledEventProcessor;
 import io.nkdtrdr.mrktmkr.triggers.processors.OrderUpdateEventProcessor;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;

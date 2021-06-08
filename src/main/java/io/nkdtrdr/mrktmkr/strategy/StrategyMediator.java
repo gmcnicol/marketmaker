@@ -118,4 +118,12 @@ public class StrategyMediator {
     public boolean currentStrategyCanTrade() {
         return activeTradingStrategy.canTrade();
     }
+
+    public BigDecimal getBestBidPrice() {
+        return ordersFacade.getBestBidPrice();
+    }
+
+    public BigDecimal getBestAskPrice() {
+        return ordersFacade.getBestAskPrice();
+    }
 }

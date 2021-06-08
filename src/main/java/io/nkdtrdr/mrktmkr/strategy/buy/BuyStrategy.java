@@ -98,6 +98,7 @@ public class BuyStrategy implements KdTradingStrategy {
 
     @Override
     public boolean canPlaceOrder(final Order order) {
+
         final boolean canAfford = affordPredicate.test(order);
         return STRATEGY_NAME.equals(order.getStrategy()) && order.getSide().equals(Order.OrderSide.BUY) && canPlaceABuy
                 && canAfford;

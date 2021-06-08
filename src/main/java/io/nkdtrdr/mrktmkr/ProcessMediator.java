@@ -138,6 +138,7 @@ public class ProcessMediator {
     @Scheduled(cron = "25 7/30 * * * *")
     public void refreshUserFeed() {
         restClient.refreshUserStream(this.listenKey);
+        restClient.getSymbolStats(this.symbol);
     }
 
     public void processKeyEvent(String eventName, String eventKey, Object payload) {
