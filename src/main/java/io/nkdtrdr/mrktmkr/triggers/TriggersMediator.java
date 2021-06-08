@@ -91,7 +91,7 @@ public class TriggersMediator {
             final Order targetOrder = orderBuilder.build();
 
             margin = valueOf(0.9997);
-            adjustedValue = order.getValue().multiply(saleCommission).multiply(margin);
+            adjustedValue = order.getValue().multiply(buyCommission).multiply(margin);
             price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
             orderBuilder.setPrice(price);
             final Order bailOrder = orderBuilder.build();
