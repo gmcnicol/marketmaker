@@ -10,8 +10,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static io.nkdtrdr.mrktmkr.disruptor.EventEnvelope.EventEnvelopeBuilder.anEventEnvelope;
-import static io.nkdtrdr.mrktmkr.dto.Order.orderIsABuy;
-import static io.nkdtrdr.mrktmkr.dto.Order.orderIsASell;
 import static java.util.function.Function.identity;
 
 
@@ -89,9 +87,9 @@ public class OrdersFacade {
 
     public void addOrderToBeTriggered(final Order order) {
 
-        if (orderIsASell(order))
+        if (Order.TriggerDirection.FROM_BELOW.equals(order.getTriggerDirection()))
             ordersMediator.addTriggeredSale(order);
-        else if (orderIsABuy(order))
+        else if (Order.TriggerDirection.FROM_ABOVE.equals(order.getTriggerDirection()))
             ordersMediator.addTriggeredBuy(order);
     }
 

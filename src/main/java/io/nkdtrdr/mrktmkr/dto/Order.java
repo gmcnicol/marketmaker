@@ -23,13 +23,15 @@ public class Order {
     private String orderId;
     private String strategy;
     private OrderTrigger orderTrigger;
+    @Id
+    private TriggerDirection triggerDirection;
 
     public Order() {
     }
 
     public Order(final String symbol, final BigDecimal quantity, final BigDecimal price, final BigDecimal value,
                  final OrderSide side, final TimeInForce timeInForce, final String orderId, final String strategy,
-                 final OrderTrigger orderTrigger) {
+                 final OrderTrigger orderTrigger, final TriggerDirection triggerDirection) {
         this.symbol = symbol;
         this.quantity = quantity;
         this.price = price;
@@ -39,6 +41,7 @@ public class Order {
         this.orderId = orderId;
         this.strategy = strategy;
         this.orderTrigger = orderTrigger;
+        this.triggerDirection = triggerDirection;
     }
 
     private Order(final Builder builder) {
@@ -51,6 +54,7 @@ public class Order {
         setOrderId(builder.orderId);
         setStrategy(builder.strategy);
         setOrderTrigger(builder.orderTrigger);
+        setTriggerDirection(builder.triggerDirection);
     }
 
     public static Builder newBuilder() {
@@ -68,6 +72,7 @@ public class Order {
         builder.orderId = copy.getOrderId();
         builder.strategy = copy.getStrategy();
         builder.orderTrigger = copy.getOrderTrigger();
+        builder.triggerDirection = copy.getTriggerDirection();
         return builder;
     }
 
@@ -161,6 +166,7 @@ public class Order {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("orderId", orderId)
+                .addValue(triggerDirection)
                 .addValue(strategy)
                 .addValue(orderTrigger)
 
@@ -176,14 +182,23 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return Objects.equal(symbol, order.symbol) && Objects.equal(quantity, order.quantity) && Objects.equal(price,
-                order.price) && side == order.side && Objects.equal(orderId, order.orderId) && Objects.equal(strategy
-                , order.strategy) && orderTrigger == order.orderTrigger;
+        return Objects.equal(getSymbol(),
+                order.getSymbol()) && Objects.equal(getQuantity(), order.getQuantity()) && Objects.equal(getPrice(),
+                order.getPrice()) && getSide() == order.getSide() && getTimeInForce() == order.getTimeInForce() && Objects.equal(getOrderId(), order.getOrderId()) && Objects.equal(getStrategy(), order.getStrategy()) && getOrderTrigger() == order.getOrderTrigger() && getTriggerDirection() == order.getTriggerDirection();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(symbol, quantity, price, side, orderId, strategy, orderTrigger);
+        return Objects.hashCode(getSymbol(), getQuantity(), getPrice(), getSide(), getTimeInForce(), getOrderId(),
+                getStrategy(), getOrderTrigger(), getTriggerDirection());
+    }
+
+    public TriggerDirection getTriggerDirection() {
+        return triggerDirection;
+    }
+
+    public void setTriggerDirection(final TriggerDirection triggerDirection) {
+        this.triggerDirection = triggerDirection;
     }
 
     public enum OrderSide {BUY, SELL}
@@ -196,6 +211,11 @@ public class Order {
 
     public enum TimeInForce {
         GTC, IOC, FOK
+    }
+
+    public enum TriggerDirection {
+        FROM_ABOVE,
+        FROM_BELOW
     }
 
     /**
@@ -211,6 +231,7 @@ public class Order {
         private String orderId;
         private String strategy;
         private OrderTrigger orderTrigger;
+        private TriggerDirection triggerDirection;
 
         private Builder() {
         }
@@ -319,6 +340,18 @@ public class Order {
         }
 
         /**
+         * Sets the {@code triggerDirection} and returns a reference to this Builder so that the methods can be
+         * chained together.
+         *
+         * @param triggerDirection the {@code triggerDirection} to set
+         * @return a reference to this Builder
+         */
+        public Builder setTriggerDirection(final TriggerDirection triggerDirection) {
+            this.triggerDirection = triggerDirection;
+            return this;
+        }
+
+        /**
          * Returns a {@code Order} built from the parameters previously set.
          *
          * @return a {@code Order} built with parameters of this {@code Order.Builder}
@@ -327,4 +360,6 @@ public class Order {
             return new Order(this);
         }
     }
+
+
 }

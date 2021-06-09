@@ -51,6 +51,7 @@ public class TriggersMediator {
             BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_ABOVE);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(newPrice);
             orderBuilder.setQuantity(grossQuantity);
@@ -65,6 +66,7 @@ public class TriggersMediator {
             newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
 
             orderBuilder = Order.newBuilder(order);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_BELOW);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(newPrice);
             orderBuilder.setQuantity(grossQuantity);
@@ -92,6 +94,7 @@ public class TriggersMediator {
             BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_BELOW);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(price);
             orderBuilder.setQuantity(netQuantity);
@@ -104,6 +107,7 @@ public class TriggersMediator {
             adjustedValue = order.getValue().multiply(buyCommission).multiply(margin);
             price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
             orderBuilder = Order.newBuilder(order);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_ABOVE);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(price);
             orderBuilder.setQuantity(netQuantity);
