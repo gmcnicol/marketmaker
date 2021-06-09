@@ -37,14 +37,15 @@ public class TriggersMediator {
     private Set<Order> getFollowupBuys(final Order order) {
         if (order.getSide().equals(Order.OrderSide.SELL)) {
             order.setStrategy("SELL");
+            final BigDecimal originalValue = order.getValue();
             final String orderId = "FBUY" + formattedDateString(now());
             final BigDecimal saleCommission = ONE.subtract(getSaleCommission());
             BigDecimal netValue =
-                    order.getValue().multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
+                    originalValue.multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
 
             final BigDecimal buyCommission = ONE.add(getBuyCommission());
-            final BigDecimal grossQuantity = order.getQuantity().multiply(buyCommission).setScale(6,
-                    RoundingMode.CEILING);
+            final BigDecimal grossQuantity =
+                    order.getQuantity().multiply(buyCommission).setScale(6,  RoundingMode.CEILING);
 
             BigDecimal margin = valueOf(0.9997);
             BigDecimal newValue = netValue.multiply(margin);
@@ -61,7 +62,7 @@ public class TriggersMediator {
 
             margin = valueOf(1.0003);
             netValue =
-                    order.getValue().multiply(buyCommission).setScale(2, RoundingMode.FLOOR);
+                    originalValue.multiply(buyCommission).setScale(2, RoundingMode.FLOOR);
             newValue = netValue.multiply(margin);
             newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
 
@@ -81,6 +82,7 @@ public class TriggersMediator {
 
     private Set<Order> getFollowupSales(final Order order) {
         if (order.getSide().equals(Order.OrderSide.BUY)) {
+            final BigDecimal originalValue = order.getValue();
             order.setStrategy("BUY");
             final BigDecimal buyCommission =
                     ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
@@ -90,7 +92,7 @@ public class TriggersMediator {
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
             BigDecimal margin = valueOf(1.0003);
-            BigDecimal adjustedValue = order.getValue().multiply(saleCommission).multiply(margin);
+            BigDecimal adjustedValue = originalValue.multiply(saleCommission).multiply(margin);
             BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
@@ -104,7 +106,7 @@ public class TriggersMediator {
             final Order targetOrder = orderBuilder.build();
 
             margin = valueOf(0.9997);
-            adjustedValue = order.getValue().multiply(buyCommission).multiply(margin);
+            adjustedValue = originalValue.multiply(buyCommission).multiply(margin);
             price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
             orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_ABOVE);
