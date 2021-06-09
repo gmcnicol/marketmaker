@@ -60,7 +60,7 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-            margin = valueOf(1.0003);
+            margin = valueOf(1.0013);
             newPrice = order.getPrice().multiply(margin);
 
             orderBuilder = Order.newBuilder(order);
@@ -102,7 +102,7 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-            margin = valueOf(0.9997);
+            margin = valueOf(0.9987);
             price = order.getPrice().multiply(margin);
             orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_ABOVE);
