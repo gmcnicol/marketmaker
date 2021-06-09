@@ -20,6 +20,7 @@ import static java.time.LocalDateTime.now;
 
 @Component
 public class SellStrategy implements KdTradingStrategy {
+    public static final BigDecimal THIRTY = valueOf(30L);
     private static final BigDecimal EIGHTY = getBigDecimal("80");
     private static final BigDecimal TWENTY = getBigDecimal("20");
     private static final String STRATEGY_NAME = "SELL";
@@ -47,7 +48,7 @@ public class SellStrategy implements KdTradingStrategy {
 
         shortTermSymbolMatches =
                 kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(
-                "1m");
+                        "1m");
 
         longSymbolMatches =
                 kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("1m");
@@ -62,10 +63,13 @@ public class SellStrategy implements KdTradingStrategy {
                 .and(greaterThanEighty)
                 .and(dOverSeventy);
 
-        canPlaceOrderPredicate = greaterThanEighty
+        final Predicate<KdValue> kGreaterThanTwenty = kdValue -> kdValue.getkValue().compareTo(TWENTY) > 0;
+        final Predicate<KdValue> dGreaterThanThirty = kdValue -> kdValue.getkValue().compareTo(THIRTY) > 0;
+
+        canPlaceOrderPredicate = kGreaterThanTwenty
                 .and(kLessThanPreviousK)
                 .and(kLessThanD)
-                .and(dOverSeventy)
+                .and(dGreaterThanThirty)
         ;
 
         this.canAffordPredicate = o -> o.getValue().compareTo(valueOf(10.10D)) >= 0;

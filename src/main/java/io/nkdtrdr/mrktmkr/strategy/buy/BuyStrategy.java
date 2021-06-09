@@ -61,8 +61,8 @@ public class BuyStrategy implements KdTradingStrategy {
                 .and(dLessThanThirty)
                 .and(kGreaterThanD);
 
-        canPlaceOrderPredicate = lessThanTwenty
-                .and(dLessThanThirty)
+        canPlaceOrderPredicate = kLessThanEighty
+                .and(dLessThanSeventy)
                 .and(kGreaterThanPreviousK)
                 .and(kGreaterThanD);
 
