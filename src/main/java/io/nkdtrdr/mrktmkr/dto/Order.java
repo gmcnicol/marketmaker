@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import static io.nkdtrdr.mrktmkr.dto.Order.OrderSide.BUY;
 import static io.nkdtrdr.mrktmkr.dto.Order.OrderSide.SELL;
 
-
 @RedisHash("order")
 public class Order {
     private String symbol;
@@ -23,7 +22,6 @@ public class Order {
     private String orderId;
     private String strategy;
     private OrderTrigger orderTrigger;
-    @Id
     private TriggerDirection triggerDirection;
 
     public Order() {
@@ -205,8 +203,7 @@ public class Order {
 
     public enum OrderTrigger {
         IMMEDIATE,
-        PRICE,
-        STRATEGY_CHANGE
+        PRICE
     }
 
     public enum TimeInForce {
@@ -215,7 +212,8 @@ public class Order {
 
     public enum TriggerDirection {
         FROM_ABOVE,
-        FROM_BELOW
+        FROM_BELOW,
+        NA
     }
 
     /**
@@ -227,11 +225,11 @@ public class Order {
         private BigDecimal price;
         private BigDecimal value;
         private OrderSide side;
-        private TimeInForce timeInForce;
+        private TimeInForce timeInForce = TimeInForce.GTC;
         private String orderId;
         private String strategy;
         private OrderTrigger orderTrigger;
-        private TriggerDirection triggerDirection;
+        private TriggerDirection triggerDirection = TriggerDirection.NA;
 
         private Builder() {
         }
@@ -360,6 +358,4 @@ public class Order {
             return new Order(this);
         }
     }
-
-
 }
