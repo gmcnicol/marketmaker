@@ -48,4 +48,13 @@ public class StrategyFacade {
     public boolean canActivateStrategy(final String candidateStrategy) {
         return strategyMediator.canActivateStrategy(candidateStrategy);
     }
+
+    public boolean isLocked(final String strategy) {
+
+        return strategy != null && strategyMediator.isLocked(strategy);
+    }
+
+    public void setLocked(final boolean locked) {
+        strategyMediator.setLocked(locked);
+    }
 }

@@ -3,6 +3,7 @@ package io.nkdtrdr.mrktmkr;
 import com.binance.api.client.BinanceApiAsyncRestClient;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.domain.account.NewOrder;
+import com.binance.api.client.domain.account.NewOrderResponse;
 import com.binance.api.client.domain.account.Order;
 import com.binance.api.client.domain.account.request.CancelOrderRequest;
 import com.binance.api.client.domain.account.request.CancelOrderResponse;
@@ -64,8 +65,8 @@ public class RestClientAdapter {
 
     public void placeOrder(NewOrder newOrder) {
         try {
-            restClient.newOrder(newOrder,
-                    newOrderResponse -> processMediator.processEvent("NEW_ORDER_PLACED", newOrderResponse));
+            final NewOrderResponse newOrderResponse = syncClient.newOrder(newOrder);
+            processMediator.processEvent("NEW_ORDER_PLACED", newOrderResponse);
         } catch (Exception e) {
             LOGGER.warn("NEW ORDER {} FAIL  {} ", newOrder.getNewClientOrderId(), getRootCauseMessage(e));
         }
@@ -96,9 +97,8 @@ public class RestClientAdapter {
                         candlesticks));
     }
 
-    public void getSymbolStats(Symbol symbol){
+    public void getSymbolStats(Symbol symbol) {
         restClient.get24HrPriceStatistics(symbol.getSymbol(),
                 tickerStatistics -> processMediator.processEvent("SYMBOL_STATS_UPDATED", tickerStatistics));
     }
-
 }

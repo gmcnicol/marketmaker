@@ -126,4 +126,12 @@ public class StrategyMediator {
     public BigDecimal getBestAskPrice() {
         return ordersFacade.getBestAskPrice();
     }
+
+    public boolean isLocked(String strategy) {
+        return this.tradingStrategyRepository.strategyByName(strategy).isLocked();
+    }
+
+    public void setLocked(final boolean locked) {
+        this.tradingStrategyRepository.all().forEach(s-> s.setLocked(locked));
+    }
 }

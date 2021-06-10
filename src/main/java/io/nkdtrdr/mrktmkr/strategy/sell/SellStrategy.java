@@ -34,6 +34,7 @@ public class SellStrategy implements KdTradingStrategy {
     private boolean canBeActivated;
     private boolean canPlaceASell;
     private StrategyMediator mediator;
+    private boolean locked;
 
     public SellStrategy() {
         name = STRATEGY_NAME;
@@ -120,6 +121,16 @@ public class SellStrategy implements KdTradingStrategy {
     @Override
     public void setMediator(StrategyMediator mediator) {
         this.mediator = mediator;
+    }
+
+    @Override
+    public boolean isLocked() {
+        return this.locked;
+    }
+
+    @Override
+    public void setLocked(final boolean locked) {
+        this.locked = locked;
     }
 
     @Override

@@ -43,7 +43,7 @@ public class DisruptorFactory {
     private static final Logger LOGGER = getLogger(DisruptorFactory.class);
 
     private static final Set<String> EXCLUDED = new HashSet<>(Set.of("ORDER_REQUESTED", "CANDLE_STICK_UPDATED",
-            "TICKER_UPDATED", "USER_ACCOUNT_POSITION_UPDATED", /*"KD_VALUE_UPDATED", "STRATEGY_TRIGGERED",*/
+            "TICKER_UPDATED", "USER_ACCOUNT_POSITION_UPDATED", "KD_VALUE_UPDATED" /*"STRATEGY_TRIGGERED"*/,
             "ACCOUNT_RECEIVED", "CANDLE_STICK_INITIALISED", "USER_LISTEN_KEY_REFRESHED"
             ));
     private final EventHandler<MakerEvent> loggerHandler = (makerEvent, l, b) -> {

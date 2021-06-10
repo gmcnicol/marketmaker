@@ -55,4 +55,14 @@ public class KdForwardingTradingStrategy implements KdTradingStrategy {
     public void setMediator(StrategyMediator mediator) {
 
     }
+
+    @Override
+    public boolean isLocked() {
+        return innerStrategy.isLocked();
+    }
+
+    @Override
+    public void setLocked(final boolean locked) {
+        innerStrategy.setLocked(locked);
+    }
 }

@@ -2,7 +2,6 @@ package io.nkdtrdr.mrktmkr.strategy;
 
 import io.nkdtrdr.mrktmkr.dto.Order;
 
-import java.util.Collection;
 
 /**
  * Trading strategy
@@ -46,7 +45,31 @@ public interface TradingStrategy<T> {
      */
     Order getInitialOrder();
 
+    /**
+     * Can trade boolean.
+     *
+     * @return the boolean
+     */
     boolean canTrade();
 
+    /**
+     * Sets mediator.
+     *
+     * @param mediator the mediator
+     */
     void setMediator(StrategyMediator mediator);
+
+    /**
+     * Is locked boolean.
+     *
+     * @return the boolean
+     */
+    boolean isLocked();
+
+    /**
+     * Sets locked.
+     *
+     * @param locked the locked
+     */
+    void setLocked(boolean locked);
 }

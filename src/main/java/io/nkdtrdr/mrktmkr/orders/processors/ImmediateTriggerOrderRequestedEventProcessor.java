@@ -6,19 +6,24 @@ import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import io.nkdtrdr.mrktmkr.dto.Order;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
+import io.nkdtrdr.mrktmkr.strategy.StrategyFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
+
 
 @Component
 public class ImmediateTriggerOrderRequestedEventProcessor implements EventProcessor {
     private final OrdersFacade ordersFacade;
     private final ProcessMediator processMediator;
+    private final StrategyFacade strategyFacade;
 
     public ImmediateTriggerOrderRequestedEventProcessor(final OrdersFacade ordersFacade,
-                                                        final ProcessMediator processMediator) {
+                                                        final ProcessMediator processMediator,
+                                                        final StrategyFacade strategyFacade) {
         this.ordersFacade = ordersFacade;
         this.processMediator = processMediator;
+        this.strategyFacade = strategyFacade;
     }
 
     @Override
@@ -32,7 +37,8 @@ public class ImmediateTriggerOrderRequestedEventProcessor implements EventProces
         if (!ordersFacade.isOrderIdOpen(order.getOrderId())
                 && order.getOrderTrigger().equals(Order.OrderTrigger.IMMEDIATE)
         ) {
-            if (ordersFacade.canPlaceOrder(order)) {
+            if (ordersFacade.canPlaceOrder(order) && !strategyFacade.isLocked(order.getStrategy())) {
+                strategyFacade.setLocked(true);
                 processMediator.placeOrder(order);
                 ordersFacade.trackOpenOrder(order);
             }

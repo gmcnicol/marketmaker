@@ -40,6 +40,7 @@ public class OrderUpdateEventProcessor implements EventProcessor {
         final boolean shouldProcess =
                 Stream.of(OrderStatus.PARTIALLY_FILLED, OrderStatus.FILLED).anyMatch(s -> s.equals(event.getOrderStatus()));
         if (shouldProcess) {
+            triggersFacade.setLocked(false);
             tradeAudit.auditOrder(event);
             if (event.getNewClientOrderId().startsWith("F")) return;
             final Order order = Order.newBuilder()

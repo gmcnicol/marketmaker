@@ -29,5 +29,6 @@ public class CancelOrderEventProcessor implements EventProcessor {
         final String orderId = makerEvent.getEventEnvelope().getPayload().toString();
         processMediator.cancelOrder(orderId, "BTCGBP");
         ordersFacade.stopTrackingOrderId(orderId);
+
     }
 }
