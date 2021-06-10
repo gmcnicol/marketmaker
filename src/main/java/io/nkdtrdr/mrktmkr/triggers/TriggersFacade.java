@@ -4,6 +4,7 @@ import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.dto.Order;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
 import io.nkdtrdr.mrktmkr.strategy.StrategyFacade;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -14,7 +15,9 @@ import java.util.function.Consumer;
 public class TriggersFacade {
     private final TriggersMediator triggersMediator;
     private final StrategyFacade strategyFacade;
-    public TriggersFacade(TriggersMediator triggersMediator, final StrategyFacade strategyFacade) {
+
+    public TriggersFacade(TriggersMediator triggersMediator, @
+            Lazy final StrategyFacade strategyFacade) {
         this.triggersMediator = triggersMediator;
         this.strategyFacade = strategyFacade;
     }
