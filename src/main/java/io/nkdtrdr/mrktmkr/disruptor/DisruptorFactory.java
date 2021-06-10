@@ -22,9 +22,8 @@ import io.nkdtrdr.mrktmkr.orders.processors.TriggeredOrderCancelledEventProcesso
 import io.nkdtrdr.mrktmkr.orders.processors.TriggeredOrderCompleteEventProcessor;
 import io.nkdtrdr.mrktmkr.persistence.processors.PersistedOrderFilledProcessor;
 import io.nkdtrdr.mrktmkr.persistence.processors.PersistenceOrderRequestedHandler;
-import io.nkdtrdr.mrktmkr.strategy.processors.KdValuesInitialisedProcessor;
-import io.nkdtrdr.mrktmkr.strategy.processors.StrategyEventProcessor;
 import io.nkdtrdr.mrktmkr.strategy.processors.InitialOrderCancelledEventProcessor;
+import io.nkdtrdr.mrktmkr.strategy.processors.StrategyEventProcessor;
 import io.nkdtrdr.mrktmkr.triggers.processors.OrderUpdateEventProcessor;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +44,7 @@ public class DisruptorFactory {
     private static final Set<String> EXCLUDED = new HashSet<>(Set.of("ORDER_REQUESTED", "CANDLE_STICK_UPDATED",
             "TICKER_UPDATED", "USER_ACCOUNT_POSITION_UPDATED", "KD_VALUE_UPDATED" /*"STRATEGY_TRIGGERED"*/,
             "ACCOUNT_RECEIVED", "CANDLE_STICK_INITIALISED", "USER_LISTEN_KEY_REFRESHED"
-            ));
+    ));
     private final EventHandler<MakerEvent> loggerHandler = (makerEvent, l, b) -> {
         final String eventName = makerEvent.getEventEnvelope().getEventName();
         if (!EXCLUDED.contains(eventName)) {
@@ -73,7 +72,6 @@ public class DisruptorFactory {
                                               InitialOrderCancelledEventProcessor initialOrderCancelledEventProcessor,
                                               CancelOrderEventProcessor cancelOrderEventProcessor,
                                               OrderUpdateEventProcessor orderUpdateEventProcessor,
-                                              KdValuesInitialisedProcessor kdValuesInitialisedProcessor,
                                               PersistedOrderFilledProcessor persistedOrderFilledProcessor,
                                               PersistenceOrderRequestedHandler persistenceOrderRequestedHandler
     ) {
@@ -89,8 +87,7 @@ public class DisruptorFactory {
                         getHasThrownEventHandler(accountUpdatedProcessor))
                 .then(getHasThrownEventHandler(cancelOrderEventProcessor))
                 .then(getHasThrownEventHandler(userListenKeyReceivedProcessor))
-                .then(getHasThrownEventHandler(kdValueUpdatedProcessor),
-                        getHasThrownEventHandler(kdValuesInitialisedProcessor))
+                .then(getHasThrownEventHandler(kdValueUpdatedProcessor))
                 .then(getHasThrownEventHandler(candleStickInitialisedProcessor),
                         getHasThrownEventHandler(candleStickReceivedProcessor))
                 .then(getHasThrownEventHandler(strategyEventProcessor))
@@ -104,7 +101,7 @@ public class DisruptorFactory {
                         getHasThrownEventHandler(persistedOrderFilledProcessor))
                 .then(
                         getHasThrownEventHandler(initialOrderCancelledEventProcessor)
-                        )
+                )
                 .then(getHasThrownEventHandler(orderUpdateEventProcessor))
                 .then(publisherHandler)
                 .then(((makerEvent, l, b) -> {
