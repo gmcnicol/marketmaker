@@ -120,10 +120,6 @@ public class OrdersFacade {
                 && orderPreChecks.orderHasEnoughValue(order);
     }
 
-    public void adjustTriggersForOrder(final Order order) {
-        ordersMediator.adjustTriggersForOrder(order);
-    }
-
     public boolean strategyHasTrigger(final String strategy) {
         return ordersMediator.strategyHasTrigger(strategy);
     }

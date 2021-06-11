@@ -9,11 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +18,7 @@ import java.util.stream.Stream;
 import static io.nkdtrdr.mrktmkr.dto.Order.orderIsABuy;
 import static io.nkdtrdr.mrktmkr.dto.Order.orderIsASell;
 import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
+import static java.util.function.Function.identity;
 
 
 @Component
@@ -77,10 +75,11 @@ public class OrdersMediator {
 
     public Collection<Order> getTriggeredBuys() {
         final BigDecimal bestAsk = getBestAsk();
-
-        return triggerBuys.tailMap(bestAsk, true)
-                .values().stream()
+        return Stream.of(triggerBuys.tailMap(bestAsk, true).values().stream(),
+                triggerSales.tailMap(bestAsk, true).values().stream())
+                .flatMap(identity())
                 .filter(order -> !liveBuys.orderExists(order.getOrderId()))
+                .filter(order -> Order.OrderSide.BUY.equals(order.getSide()))
                 .map(o -> Order.newBuilder(o)
                         .setQuantity(o.getQuantity())
                         .setPrice(bestAsk).build())
@@ -122,11 +121,12 @@ public class OrdersMediator {
     public Collection<Order> getTriggeredSells() {
         final BigDecimal bestBid = getBestBid();
 
-        return triggerSales.headMap(bestBid, true).values()
-                .stream()
+        return Stream.of(triggerSales.headMap(bestBid, true).values().stream().sequential(),
+                this.triggerBuys.headMap(bestBid, true).values().stream().sequential())
+                .flatMap(identity())
                 .filter(o -> !liveSells.orderExists(o.getOrderId()))
-                .map(o -> Order.newBuilder(o)
-                        .setQuantity(o.getQuantity()).setPrice(bestBid).build())
+                .filter(order -> Order.OrderSide.SELL.equals(order.getSide()))
+                .map(o -> Order.newBuilder(o).setPrice(bestBid).build())
                 .filter(orderPreChecks::orderHasEnoughValue)
                 .filter(orderPreChecks::accountCanAffordOrder)
                 .peek(order -> LOGGER.info("TRIGGER SALE {} £{}", order.getOrderId(), order.getValue()))
@@ -150,57 +150,8 @@ public class OrdersMediator {
         Predicate<BigDecimal> buyOutOfRange = p -> p.subtract(getBestBid()).abs().compareTo(buyRange) > 0;
         final Stream<String> buyStream = liveBuys.getOrderIdsToCancel(buyOutOfRange).stream();
 
-        return Stream.of(buyStream, stream).flatMap(Function.identity())
+        return Stream.of(buyStream, stream).flatMap(identity())
                 .collect(Collectors.toSet());
-    }
-
-    public void adjustTriggersForOrder(final Order order) {
-        if (orderIsABuy(order)) {
-            adjustBuyTriggers(order);
-        } else if (orderIsASell(order)) {
-            adjustSellTriggers(order);
-        }
-
-        LOGGER.debug("Adjusted Triggers {}", this.triggersString());
-    }
-
-    private void adjustSellTriggers(final Order order) {
-        final Collection<Order> orders = triggerSales.headMap(order.getValue()).values();
-        Set<String> ordersToRemove = new HashSet<>();
-        for (Order o : orders) {
-            if (order.getValue().compareTo(BigDecimal.valueOf(10.10D)) <= 0) break;
-            if (o.getValue().compareTo(order.getValue()) <= 0) {
-                ordersToRemove.add(o.getOrderId());
-                final BigDecimal subtract = order.getValue().subtract(o.getValue());
-                order.setValue(subtract);
-            }
-            if (o.getValue().compareTo(order.getValue()) > 0) {
-                final BigDecimal subtract = o.getValue().subtract(order.getValue());
-                o.setValue(subtract);
-                order.setValue(BigDecimal.ZERO);
-            }
-        }
-        ordersToRemove.forEach(this::removeTrigger);
-    }
-
-    private void adjustBuyTriggers(final Order order) {
-        final Collection<Order> orders = triggerBuys.tailMap(order.getValue(), true).values();
-        Set<String> ordersToRemove = new HashSet<>();
-        for (Order o : orders) {
-            if (order.getValue().compareTo(BigDecimal.valueOf(10.10)) <= 0) break;
-            order.setValue(null);
-            if (o.getQuantity().compareTo(order.getQuantity()) <= 0) {
-                ordersToRemove.add(o.getOrderId());
-                final BigDecimal subtract = order.getQuantity().subtract(o.getQuantity());
-                order.setQuantity(subtract);
-            }
-            if (o.getQuantity().compareTo(order.getQuantity()) > 0) {
-                final BigDecimal subtract = o.getQuantity().subtract(order.getQuantity());
-                o.setQuantity(subtract);
-                order.setQuantity(BigDecimal.ZERO);
-            }
-        }
-        ordersToRemove.forEach(this::removeTrigger);
     }
 
     private String triggersString() {
