@@ -1,7 +1,6 @@
 package io.nkdtrdr.mrktmkr.orders;
 
 import com.google.common.base.MoreObjects;
-import io.nkdtrdr.mrktmkr.account.AccountFacade;
 import io.nkdtrdr.mrktmkr.dto.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +73,7 @@ public class OrdersMediator {
 
     public Collection<Order> getTriggeredBuys() {
         final BigDecimal bestAsk = getBestAsk();
-        LOGGER.info("Getting Trigger Buys {}", triggersString());
+
         return Stream.of(triggerBuys.tailMap(bestAsk, true).values().stream(),
                 triggerSales.tailMap(bestAsk, true).values().stream())
                 .flatMap(identity())
@@ -127,7 +126,7 @@ public class OrdersMediator {
                 .map(o -> Order.newBuilder(o).setPrice(bestBid).build())
                 .filter(orderPreChecks::orderHasEnoughValue)
                 .filter(orderPreChecks::accountCanAffordOrder)
-                .peek(order -> LOGGER.info("TRIGGER SALE {} £{}", order.getOrderId(), order.getValue()))
+                .peek(order -> LOGGER.info("TRIGGER SALE {} ", order.getValue()))
                 .collect(Collectors.toSet());
     }
 
