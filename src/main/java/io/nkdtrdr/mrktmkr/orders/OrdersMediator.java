@@ -30,13 +30,11 @@ public class OrdersMediator {
     private final LiveOrderTracker liveBuys;
     private final LiveOrderTracker liveSells;
     private final OrderPreChecks orderPreChecks;
-    private final AccountFacade accountFacade;
     private BigDecimal bestAsk;
     private BigDecimal bestBid;
 
-    public OrdersMediator(final OrderPreChecks orderPreChecks, final AccountFacade accountFacade) {
+    public OrdersMediator(final OrderPreChecks orderPreChecks) {
         this.orderPreChecks = orderPreChecks;
-        this.accountFacade = accountFacade;
 
         this.triggerSales = new ConcurrentSkipListMap<>();
         this.triggerBuys = new ConcurrentSkipListMap<>();
@@ -49,7 +47,6 @@ public class OrdersMediator {
     private static BiFunction<BigDecimal, Order, Order> bumpOrderQuantity(final Order order) {
         return (p, o) -> {
             if (o.getOrderId().equals(order.getOrderId())) return o;
-
             o.setQuantity(o.getQuantity().add(order.getQuantity()));
             return o;
         };
@@ -58,7 +55,7 @@ public class OrdersMediator {
     public void addTriggeredBuy(final Order order) {
         triggerBuys.computeIfPresent(order.getPrice(), bumpOrderQuantity(order));
         triggerBuys.putIfAbsent(order.getPrice(), order);
-        LOGGER.debug("Adding Trigger Buy {}", this.triggersString());
+        LOGGER.info("Added Trigger Buy {}", this.triggersString());
     }
 
     public boolean strategyHasTrigger(String strategy) {
@@ -72,11 +69,12 @@ public class OrdersMediator {
     public void addTriggeredSale(final Order order) {
         triggerSales.computeIfPresent(order.getPrice(), bumpOrderQuantity(order));
         triggerSales.putIfAbsent(order.getPrice(), order);
-        LOGGER.debug("Adding Trigger Sale {}", this.triggersString());
+        LOGGER.info("Added Trigger Sale {}", this.triggersString());
     }
 
     public Collection<Order> getTriggeredBuys() {
         final BigDecimal bestAsk = getBestAsk();
+        LOGGER.info("Getting Trigger Buys {}", triggersString());
         return Stream.of(triggerBuys.tailMap(bestAsk, true).values().stream(),
                 triggerSales.tailMap(bestAsk, true).values().stream())
                 .flatMap(identity())
@@ -85,7 +83,7 @@ public class OrdersMediator {
                 .map(o -> Order.newBuilder(o).setPrice(bestAsk).build())
                 .filter(orderPreChecks::orderHasEnoughValue)
                 .filter(orderPreChecks::accountCanAffordOrder)
-                .peek(order -> LOGGER.info("TRIGGER BUY {} £{}", order.getOrderId(), order.getValue()))
+                .peek(order -> LOGGER.info("TRIGGER BUY {}", order))
                 .collect(Collectors.toSet());
     }
 

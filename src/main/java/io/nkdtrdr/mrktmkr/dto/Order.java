@@ -166,8 +166,6 @@ public class Order {
                 .add("orderId", orderId)
                 .addValue(triggerDirection)
                 .addValue(strategy)
-                .addValue(orderTrigger)
-
                 .add("quantity", quantity)
                 .add("price", price)
                 .add("value", value)
