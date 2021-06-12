@@ -48,6 +48,8 @@ public class OrdersMediator {
 
     private static BiFunction<BigDecimal, Order, Order> bumpOrderQuantity(final Order order) {
         return (p, o) -> {
+            if (o.getOrderId().equals(order.getOrderId())) return o;
+
             o.setQuantity(o.getQuantity().add(order.getQuantity()));
             return o;
         };
@@ -56,7 +58,7 @@ public class OrdersMediator {
     public void addTriggeredBuy(final Order order) {
         triggerBuys.computeIfPresent(order.getPrice(), bumpOrderQuantity(order));
         triggerBuys.putIfAbsent(order.getPrice(), order);
-        LOGGER.debug("Trigger Buy {}", this.triggersString());
+        LOGGER.debug("Adding Trigger Buy {}", this.triggersString());
     }
 
     public boolean strategyHasTrigger(String strategy) {
@@ -70,7 +72,7 @@ public class OrdersMediator {
     public void addTriggeredSale(final Order order) {
         triggerSales.computeIfPresent(order.getPrice(), bumpOrderQuantity(order));
         triggerSales.putIfAbsent(order.getPrice(), order);
-        LOGGER.debug("Trigger Sale {}", this.triggersString());
+        LOGGER.debug("Adding Trigger Sale {}", this.triggersString());
     }
 
     public Collection<Order> getTriggeredBuys() {
