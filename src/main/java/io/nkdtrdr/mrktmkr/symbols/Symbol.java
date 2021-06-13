@@ -57,8 +57,10 @@ public class Symbol {
 
     public BigDecimal getOrderPriceAdjustment() {
         return orderPriceAdjustment;
+    }
 
-
+    public void setOrderPriceAdjustment(final BigDecimal orderPriceAdjustment) {
+        this.orderPriceAdjustment = orderPriceAdjustment;
     }
 
     @Override
