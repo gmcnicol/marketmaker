@@ -14,8 +14,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.nkdtrdr.mrktmkr.dto.Order.TriggerDirection.FROM_ABOVE;
-import static io.nkdtrdr.mrktmkr.dto.Order.TriggerDirection.FROM_BELOW;
+import static io.nkdtrdr.mrktmkr.dto.Order.TriggerDirection.BAIL_OUT;
+import static io.nkdtrdr.mrktmkr.dto.Order.TriggerDirection.INTENDED;
 import static io.nkdtrdr.mrktmkr.dto.Order.orderIsABuy;
 import static io.nkdtrdr.mrktmkr.dto.Order.orderIsASell;
 import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
@@ -77,9 +77,9 @@ public class OrdersMediator {
         final BigDecimal bestAsk = getBestAsk();
         return Stream.of(
                 triggerBuys.tailMap(bestAsk, true).values().stream()
-                        .filter(order -> directionMatches(order, FROM_ABOVE)),
+                        .filter(order -> directionMatches(order, INTENDED)),
                 triggerBuys.headMap(bestAsk, true).values().stream()
-                        .filter(order -> directionMatches(order, FROM_BELOW)))
+                        .filter(order -> directionMatches(order, BAIL_OUT)))
                 .flatMap(identity())
                 .filter(order -> !liveBuys.orderExists(order.getOrderId()))
                 .filter(order -> Order.OrderSide.BUY.equals(order.getSide()))
@@ -123,9 +123,9 @@ public class OrdersMediator {
         final BigDecimal bestBid = getBestBid();
 
         return Stream.of(triggerSales.headMap(bestBid, true).values().stream().filter(order -> directionMatches(order
-                , FROM_BELOW)),
+                , INTENDED)),
                 this.triggerSales.tailMap(bestBid, true).values().stream().filter(order -> directionMatches(order,
-                        FROM_ABOVE)))
+                        BAIL_OUT)))
                 .flatMap(identity())
                 .filter(o -> !liveSells.orderExists(o.getOrderId()))
                 .filter(order -> Order.OrderSide.SELL.equals(order.getSide()))

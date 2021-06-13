@@ -52,7 +52,7 @@ public class TriggersMediator {
             BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
-            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_ABOVE);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(newPrice);
             orderBuilder.setQuantity(grossQuantity);
@@ -60,11 +60,11 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-            margin = valueOf(1.0017);
+            margin = valueOf(1.0034);
             newPrice = order.getPrice().multiply(margin);
 
             orderBuilder = Order.newBuilder(order);
-            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_BELOW);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(newPrice);
             orderBuilder.setQuantity(grossQuantity);
@@ -93,7 +93,7 @@ public class TriggersMediator {
             BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
-            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_BELOW);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(price);
             orderBuilder.setQuantity(netQuantity);
@@ -102,10 +102,10 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-            margin = valueOf(0.9983);
+            margin = valueOf(0.9967);
             price = order.getPrice().multiply(margin);
             orderBuilder = Order.newBuilder(order);
-            orderBuilder.setTriggerDirection(Order.TriggerDirection.FROM_ABOVE);
+            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
             orderBuilder.setPrice(price);
             orderBuilder.setQuantity(netQuantity);

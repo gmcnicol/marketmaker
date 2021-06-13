@@ -206,8 +206,8 @@ public class Order {
     }
 
     public enum TriggerDirection {
-        FROM_ABOVE,
-        FROM_BELOW,
+        INTENDED,
+        BAIL_OUT,
         NA
     }
 
