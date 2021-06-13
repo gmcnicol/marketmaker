@@ -25,7 +25,7 @@ public class PersistenceFacade {
     }
 
     public void stopTrackingOrderId(String orderId) {
-        orderRepository.deleteByOrderId(orderId);
+        orderRepository.removeByOrderId(orderId);
     }
 
     public Collection<Order> getAllOrders() {

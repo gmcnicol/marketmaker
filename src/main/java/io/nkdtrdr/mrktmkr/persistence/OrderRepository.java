@@ -5,10 +5,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Repository
 public interface OrderRepository extends CrudRepository<Order, BigDecimal> {
 
-    void deleteByOrderId(String orderId);
+    List<Order> removeByOrderId(String orderId);
 }
