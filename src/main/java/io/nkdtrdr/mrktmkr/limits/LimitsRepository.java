@@ -21,7 +21,8 @@ public class LimitsRepository {
     }
 
     public Limit getLimitForAssetAndStrategy(String asset, String strategy) {
-        return limits.stream().filter(limit -> limit.getAsset().equals(asset))
+        return limits.stream()
+                .filter(limit -> limit.getAsset().equals(asset))
                 .filter(limit -> limit.getStrategy().equals(strategy))
                 .findFirst().orElse(null);
     }

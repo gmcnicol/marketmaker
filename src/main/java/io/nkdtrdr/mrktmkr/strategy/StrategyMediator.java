@@ -19,7 +19,6 @@ import static io.nkdtrdr.mrktmkr.utilities.OrderCalculations.aCalculator;
 
 @Component
 public class StrategyMediator {
-    private static final BigDecimal PENNY = BigDecimal.ONE.scaleByPowerOfTen(-2);
     public final TriggersFacade triggersFacade;
     private final TradingStrategyRepository<KdValue> tradingStrategyRepository;
     private final KdForwardingTradingStrategy activeTradingStrategy;
@@ -66,7 +65,7 @@ public class StrategyMediator {
                             ? accountFacade.getFreeBalanceForAsset(symbol.getQuoteSymbol())
                             : limitForAssetAndStrategy.getAssetCap();
 
-            final BigDecimal price = ordersFacade.getBestAskPrice().add(PENNY);
+            final BigDecimal price = getBestAskPrice().add(symbol.getOrderPriceAdjustment());
             final BigDecimal quantity = gbp.divide(price, 6, RoundingMode.FLOOR);
             initialOrder.setPrice(price);
             initialOrder.setQuantity(quantity);
@@ -77,7 +76,7 @@ public class StrategyMediator {
                     limitsRepository.getLimitForAssetAndStrategy(symbol.getBaseSymbol(), initialOrder.getStrategy());
 
             final BigDecimal maxQuantity = aCalculator()
-                    .withPrice(ordersFacade.getBestBidPrice().subtract(PENNY))
+                    .withPrice(getBestBidPrice().subtract(symbol.getOrderPriceAdjustment()))
                     .withCost(AccountFacade.VALUE_CAP)
                     .withRounding(RoundingMode.CEILING)
                     .getQuantity();
@@ -85,7 +84,7 @@ public class StrategyMediator {
             final BigDecimal quantity = limitForAssetAndStrategy == null
                     ? getFreeBalanceForAsset(symbol.getBaseSymbol()).min(maxQuantity)
                     : limitForAssetAndStrategy.getAssetCap();
-            final BigDecimal price = ordersFacade.getBestBidPrice().subtract(PENNY);
+            final BigDecimal price = getBestBidPrice().subtract(symbol.getOrderPriceAdjustment());
             initialOrder.setQuantity(quantity);
             initialOrder.setPrice(price);
         }

@@ -19,6 +19,7 @@ symbol:
   base: BTC
   quote: GBP
   minimum-order: 10.10
+  order-price-adjustment: 0.01
 
 binance:
   api-key: ${BINANCE_API_KEY}

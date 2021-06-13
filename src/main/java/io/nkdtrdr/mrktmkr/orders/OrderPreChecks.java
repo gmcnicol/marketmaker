@@ -2,6 +2,8 @@ package io.nkdtrdr.mrktmkr.orders;
 
 import io.nkdtrdr.mrktmkr.account.AccountFacade;
 import io.nkdtrdr.mrktmkr.dto.Order;
+import io.nkdtrdr.mrktmkr.symbols.Symbol;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -11,27 +13,31 @@ import java.math.BigDecimal;
 public class OrderPreChecks {
 
     private final AccountFacade accountBalanceCache;
+    private final Symbol symbol;
 
-    public OrderPreChecks(final AccountFacade accountBalanceCache) {
+    public OrderPreChecks(final AccountFacade accountBalanceCache,
+                          @Lazy Symbol symbol) {
         this.accountBalanceCache = accountBalanceCache;
+        this.symbol = symbol;
     }
 
     public boolean accountCanAffordOrder(Order order) {
-        final BigDecimal btc = accountBalanceCache.getFreeBalanceForAsset("BTC");
-        final BigDecimal gbp = accountBalanceCache.getFreeBalanceForAsset("GBP");
+
+        final BigDecimal baseFree = accountBalanceCache.getFreeBalanceForAsset(symbol.getBaseSymbol());
+        final BigDecimal quoteFree = accountBalanceCache.getFreeBalanceForAsset(symbol.getQuoteSymbol());
 
         if (order.getSide().equals(Order.OrderSide.SELL)) {
-            return order.getQuantity().compareTo(btc) <= 0;
+            return order.getQuantity().compareTo(baseFree) <= 0;
         }
 
         if (order.getSide().equals(Order.OrderSide.BUY)) {
-            return order.getValue().compareTo(gbp) <= 0;
+            return order.getValue().compareTo(quoteFree) <= 0;
         }
 
         return false;
     }
 
     public boolean orderHasEnoughValue(Order order) {
-        return order.getValue().compareTo(BigDecimal.valueOf(10.10D)) >= 0;
+        return order.getValue().compareTo(symbol.getMinimumOrderValue()) >= 0;
     }
 }

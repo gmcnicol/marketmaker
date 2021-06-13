@@ -1,5 +1,7 @@
 package io.nkdtrdr.mrktmkr.symbols;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,9 @@ public class Symbol {
 
     @Value("${symbol.minimum-order}")
     private BigDecimal minimumOrderValue;
+
+    @Value("${order-price-adjustment}")
+    private BigDecimal orderPriceAdjustment;
 
     public String getBaseSymbol() {
         return baseSymbol;
@@ -48,5 +53,35 @@ public class Symbol {
 
     public String getSymbol() {
         return format("%s%s", baseSymbol, quoteSymbol);
+    }
+
+    public BigDecimal getOrderPriceAdjustment() {
+        return orderPriceAdjustment;
+
+
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Symbol symbol = (Symbol) o;
+        return Objects.equal(getBaseSymbol(), symbol.getBaseSymbol()) && Objects.equal(getQuoteSymbol(),
+                symbol.getQuoteSymbol()) && Objects.equal(getMinimumOrderValue(), symbol.getMinimumOrderValue()) && Objects.equal(getOrderPriceAdjustment(), symbol.getOrderPriceAdjustment());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getBaseSymbol(), getQuoteSymbol(), getMinimumOrderValue(), getOrderPriceAdjustment());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("baseSymbol", baseSymbol)
+                .add("quoteSymbol", quoteSymbol)
+                .add("minimumOrderValue", minimumOrderValue)
+                .add("orderPriceAdjustment", orderPriceAdjustment)
+                .toString();
     }
 }

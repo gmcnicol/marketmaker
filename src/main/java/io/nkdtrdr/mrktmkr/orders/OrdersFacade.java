@@ -86,10 +86,10 @@ public class OrdersFacade {
     }
 
     public void addOrderToBeTriggered(final Order order) {
-
-        if (Order.TriggerDirection.FROM_BELOW.equals(order.getTriggerDirection()))
+        final Order.OrderSide side = order.getSide();
+        if (Order.OrderSide.SELL.equals(side))
             ordersMediator.addTriggeredSale(order);
-        else if (Order.TriggerDirection.FROM_ABOVE.equals(order.getTriggerDirection()))
+        else if (Order.OrderSide.BUY.equals(side))
             ordersMediator.addTriggeredBuy(order);
     }
 

@@ -14,6 +14,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.nkdtrdr.mrktmkr.dto.Order.TriggerDirection.FROM_ABOVE;
+import static io.nkdtrdr.mrktmkr.dto.Order.TriggerDirection.FROM_BELOW;
 import static io.nkdtrdr.mrktmkr.dto.Order.orderIsABuy;
 import static io.nkdtrdr.mrktmkr.dto.Order.orderIsASell;
 import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
@@ -73,9 +75,11 @@ public class OrdersMediator {
 
     public Collection<Order> getTriggeredBuys() {
         final BigDecimal bestAsk = getBestAsk();
-
-        return Stream.of(triggerBuys.tailMap(bestAsk, true).values().stream(),
-                triggerSales.tailMap(bestAsk, true).values().stream())
+        return Stream.of(
+                triggerBuys.tailMap(bestAsk, true).values().stream()
+                        .filter(order -> directionMatches(order, FROM_ABOVE)),
+                triggerBuys.headMap(bestAsk, true).values().stream()
+                        .filter(order -> directionMatches(order, FROM_BELOW)))
                 .flatMap(identity())
                 .filter(order -> !liveBuys.orderExists(order.getOrderId()))
                 .filter(order -> Order.OrderSide.BUY.equals(order.getSide()))
@@ -118,8 +122,10 @@ public class OrdersMediator {
     public Collection<Order> getTriggeredSells() {
         final BigDecimal bestBid = getBestBid();
 
-        return Stream.of(triggerSales.headMap(bestBid, true).values().stream().sequential(),
-                this.triggerBuys.headMap(bestBid, true).values().stream().sequential())
+        return Stream.of(triggerSales.headMap(bestBid, true).values().stream().filter(order -> directionMatches(order
+                , FROM_BELOW)),
+                this.triggerSales.tailMap(bestBid, true).values().stream().filter(order -> directionMatches(order,
+                        FROM_ABOVE)))
                 .flatMap(identity())
                 .filter(o -> !liveSells.orderExists(o.getOrderId()))
                 .filter(order -> Order.OrderSide.SELL.equals(order.getSide()))
@@ -128,6 +134,10 @@ public class OrdersMediator {
                 .filter(orderPreChecks::accountCanAffordOrder)
                 .peek(order -> LOGGER.info("TRIGGER SALE {} ", order.getValue()))
                 .collect(Collectors.toSet());
+    }
+
+    private boolean directionMatches(final Order order, final Order.TriggerDirection fromAbove) {
+        return fromAbove.equals(order.getTriggerDirection());
     }
 
     BigDecimal getBestAsk() {
