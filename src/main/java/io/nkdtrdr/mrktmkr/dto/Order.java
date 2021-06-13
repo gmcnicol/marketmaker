@@ -15,10 +15,10 @@ public class Order {
     private String symbol;
     private BigDecimal quantity;
     private BigDecimal price;
+    @Id
     private BigDecimal value;
     private OrderSide side;
     private TimeInForce timeInForce;
-    @Id
     private String orderId;
     private String strategy;
     private OrderTrigger orderTrigger;
@@ -109,9 +109,6 @@ public class Order {
     }
 
     public BigDecimal getValue() {
-        if (value != null) {
-            return value;
-        }
         value = this.getQuantity().multiply(this.getPrice());
         return value;
     }

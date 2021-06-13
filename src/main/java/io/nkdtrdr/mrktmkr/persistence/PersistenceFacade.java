@@ -16,16 +16,16 @@ public class PersistenceFacade {
     }
 
     public void trackOrder(Order order) {
-        if (orderRepository.existsById(order.getOrderId())) {
+        if (orderRepository.existsById(order.getValue())) {
             //noinspection OptionalGetWithoutIsPresent
-            final Order existingOrder = orderRepository.findById(order.getOrderId()).get();
+            final Order existingOrder = orderRepository.findById(order.getValue()).get();
             order.setQuantity(existingOrder.getQuantity().add(order.getQuantity()));
         }
         orderRepository.save(order);
     }
 
     public void stopTrackingOrderId(String orderId) {
-        orderRepository.deleteById(orderId);
+        orderRepository.deleteByOrderId(orderId);
     }
 
     public Collection<Order> getAllOrders() {
