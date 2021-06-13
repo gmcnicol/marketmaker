@@ -38,7 +38,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Configuration
 public class DisruptorFactory {
-    public static final int RING_BUFFER_SIZE = 128;
+    public static final int RING_BUFFER_SIZE = 256;
     private static final Logger LOGGER = getLogger(DisruptorFactory.class);
 
     private static final Set<String> EXCLUDED = new HashSet<>(Set.of("ORDER_REQUESTED", "CANDLE_STICK_UPDATED",
