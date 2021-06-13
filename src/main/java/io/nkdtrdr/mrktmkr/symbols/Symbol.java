@@ -21,7 +21,7 @@ public class Symbol {
     @Value("${symbol.minimum-order}")
     private BigDecimal minimumOrderValue;
 
-    @Value("${order-price-adjustment}")
+    @Value("${symbol.order-price-adjustment}")
     private BigDecimal orderPriceAdjustment;
 
     public String getBaseSymbol() {
