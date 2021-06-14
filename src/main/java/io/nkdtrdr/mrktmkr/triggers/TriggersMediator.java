@@ -37,15 +37,17 @@ public class TriggersMediator {
     private Set<Order> getFollowupBuys(final Order order) {
         if (order.getSide().equals(Order.OrderSide.SELL)) {
             order.setStrategy("SELL");
-            final BigDecimal originalValue = order.getValue();
+            final OrderStrings orderStrings = OrderStrings.fromOrder(order);
             final String orderId = "FBUY" + formattedDateString(now());
+
             final BigDecimal saleCommission = ONE.subtract(getSaleCommission());
             BigDecimal netValue =
-                    originalValue.multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
+                    new BigDecimal(orderStrings.originalValue).multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
 
             final BigDecimal buyCommission = ONE.add(getBuyCommission());
             final BigDecimal grossQuantity =
-                    order.getQuantity().multiply(buyCommission).setScale(6, RoundingMode.CEILING);
+                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6,
+                            RoundingMode.CEILING);
 
             BigDecimal margin = valueOf(0.9997);
             BigDecimal newValue = netValue.multiply(margin);
@@ -54,14 +56,14 @@ public class TriggersMediator {
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-            orderBuilder.setPrice(newPrice);
+            orderBuilder.setPrice(new BigDecimal(newPrice.toString()));
             orderBuilder.setQuantity(grossQuantity);
             orderBuilder.setSide(Order.OrderSide.BUY);
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
             margin = valueOf(1.0034);
-            newPrice = order.getPrice().multiply(margin);
+            newPrice = new BigDecimal(orderStrings.originalPrice).multiply(margin);
 
             orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
@@ -79,23 +81,25 @@ public class TriggersMediator {
 
     private Set<Order> getFollowupSales(final Order order) {
         if (order.getSide().equals(Order.OrderSide.BUY)) {
-            final BigDecimal originalValue = order.getValue();
+            final OrderStrings orderStrings = OrderStrings.fromOrder(order);
+
             order.setStrategy("BUY");
             final BigDecimal buyCommission =
                     ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
-                    order.getQuantity().multiply(buyCommission).setScale(6, RoundingMode.FLOOR);
+                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6, RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
             BigDecimal margin = valueOf(1.0003);
-            BigDecimal adjustedValue = originalValue.multiply(saleCommission).multiply(margin);
+            BigDecimal adjustedValue =
+                    new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
             BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-            orderBuilder.setPrice(price);
+            orderBuilder.setPrice(new BigDecimal(price.toString()));
             orderBuilder.setQuantity(netQuantity);
             orderBuilder.setSide(Order.OrderSide.SELL);
             final String orderId = "FSELL" + formattedDateString(now());
@@ -103,7 +107,7 @@ public class TriggersMediator {
             final Order targetOrder = orderBuilder.build();
 
             margin = valueOf(0.9967);
-            price = order.getPrice().multiply(margin);
+            price = new BigDecimal(orderStrings.originalPrice).multiply(margin);
             orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
@@ -127,5 +131,25 @@ public class TriggersMediator {
 
     public BigDecimal getFreeBalanceForAsset(String asset) {
         return accountFacade.getFreeBalanceForAsset(asset);
+    }
+
+    private static class OrderStrings {
+        private final String originalValue;
+        private final String originalPrice;
+        private final String originalQuantity;
+
+        private OrderStrings(final String originalValue, final String originalPrice, final String originalQuantity) {
+            this.originalValue = originalValue;
+            this.originalPrice = originalPrice;
+            this.originalQuantity = originalQuantity;
+        }
+
+        private static OrderStrings fromOrder(Order order) {
+            return new OrderStrings(
+                    order.getValue().toString(),
+                    order.getPrice().toString(),
+                    order.getQuantity().toString());
+        }
+
     }
 }
