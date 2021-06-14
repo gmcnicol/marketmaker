@@ -111,7 +111,7 @@ public class Order {
     public void setPrice(final BigDecimal price) {
         this.value = null;
         this.price = price;
-        this.priceString = price.toString();
+        this.priceString = (price != null) ? price.toString() : "";
     }
 
     public BigDecimal getValue() {
