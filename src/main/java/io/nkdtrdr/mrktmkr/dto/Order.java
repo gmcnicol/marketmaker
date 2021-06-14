@@ -56,7 +56,7 @@ public class Order {
         setStrategy(builder.strategy);
         setOrderTrigger(builder.orderTrigger);
         setTriggerDirection(builder.triggerDirection);
-        this.priceString = price.toString();
+        this.priceString = (price != null) ? price.toString() : "";
     }
 
     public static Builder newBuilder() {
