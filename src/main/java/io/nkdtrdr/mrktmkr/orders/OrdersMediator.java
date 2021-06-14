@@ -132,7 +132,7 @@ public class OrdersMediator {
                 .map(o -> Order.newBuilder(o).setPrice(bestBid).build())
                 .filter(orderPreChecks::orderHasEnoughValue)
                 .filter(orderPreChecks::accountCanAffordOrder)
-                .peek(order -> LOGGER.info("TRIGGER SALE {} ", order.getValue()))
+                .peek(order -> LOGGER.info("TRIGGER SALE {} ", order))
                 .collect(Collectors.toSet());
     }
 

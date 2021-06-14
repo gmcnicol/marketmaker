@@ -10,12 +10,12 @@ import java.math.BigDecimal;
 import static io.nkdtrdr.mrktmkr.dto.Order.OrderSide.BUY;
 import static io.nkdtrdr.mrktmkr.dto.Order.OrderSide.SELL;
 
+
 @RedisHash("order")
 public class Order {
     private String symbol;
     private BigDecimal quantity;
     private BigDecimal price;
-    @Id
     private BigDecimal value;
     private OrderSide side;
     private TimeInForce timeInForce;
@@ -23,13 +23,15 @@ public class Order {
     private String strategy;
     private OrderTrigger orderTrigger;
     private TriggerDirection triggerDirection;
+    @Id
+    private String priceString;
 
     public Order() {
     }
 
     public Order(final String symbol, final BigDecimal quantity, final BigDecimal price, final BigDecimal value,
                  final OrderSide side, final TimeInForce timeInForce, final String orderId, final String strategy,
-                 final OrderTrigger orderTrigger, final TriggerDirection triggerDirection) {
+                 final OrderTrigger orderTrigger, final TriggerDirection triggerDirection, final String priceString) {
         this.symbol = symbol;
         this.quantity = quantity;
         this.price = price;
@@ -40,6 +42,7 @@ public class Order {
         this.strategy = strategy;
         this.orderTrigger = orderTrigger;
         this.triggerDirection = triggerDirection;
+        this.priceString = priceString;
     }
 
     private Order(final Builder builder) {
@@ -53,6 +56,7 @@ public class Order {
         setStrategy(builder.strategy);
         setOrderTrigger(builder.orderTrigger);
         setTriggerDirection(builder.triggerDirection);
+        this.priceString = price.toString();
     }
 
     public static Builder newBuilder() {
@@ -71,6 +75,7 @@ public class Order {
         builder.strategy = copy.getStrategy();
         builder.orderTrigger = copy.getOrderTrigger();
         builder.triggerDirection = copy.getTriggerDirection();
+
         return builder;
     }
 
@@ -106,6 +111,7 @@ public class Order {
     public void setPrice(final BigDecimal price) {
         this.value = null;
         this.price = price;
+        this.priceString = price.toString();
     }
 
     public BigDecimal getValue() {
@@ -192,6 +198,10 @@ public class Order {
 
     public void setTriggerDirection(final TriggerDirection triggerDirection) {
         this.triggerDirection = triggerDirection;
+    }
+
+    public String getPriceString() {
+        return priceString;
     }
 
     public enum OrderSide {BUY, SELL}
