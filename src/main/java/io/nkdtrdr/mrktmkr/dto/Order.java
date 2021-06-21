@@ -1,18 +1,19 @@
 package io.nkdtrdr.mrktmkr.dto;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.redis.core.RedisHash;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
-import static io.nkdtrdr.mrktmkr.dto.Order.OrderSide.BUY;
-import static io.nkdtrdr.mrktmkr.dto.Order.OrderSide.SELL;
 
-
-@RedisHash("order")
+@Entity(name = "trade")
 public class Order {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String symbol;
     private BigDecimal quantity;
     private BigDecimal price;
@@ -23,29 +24,15 @@ public class Order {
     private String strategy;
     private OrderTrigger orderTrigger;
     private TriggerDirection triggerDirection;
-    @Id
-    private String priceString;
+    private String orderStatus;
+    private Boolean wasTraded = false;
 
     public Order() {
-    }
 
-    public Order(final String symbol, final BigDecimal quantity, final BigDecimal price, final BigDecimal value,
-                 final OrderSide side, final TimeInForce timeInForce, final String orderId, final String strategy,
-                 final OrderTrigger orderTrigger, final TriggerDirection triggerDirection, final String priceString) {
-        this.symbol = symbol;
-        this.quantity = quantity;
-        this.price = price;
-        this.value = value;
-        this.side = side;
-        this.timeInForce = timeInForce;
-        this.orderId = orderId;
-        this.strategy = strategy;
-        this.orderTrigger = orderTrigger;
-        this.triggerDirection = triggerDirection;
-        this.priceString = priceString;
     }
 
     private Order(final Builder builder) {
+        setId(builder.id);
         setSymbol(builder.symbol);
         setQuantity(builder.quantity);
         setPrice(builder.price);
@@ -56,7 +43,15 @@ public class Order {
         setStrategy(builder.strategy);
         setOrderTrigger(builder.orderTrigger);
         setTriggerDirection(builder.triggerDirection);
-        this.priceString = (price != null) ? price.toString() : "";
+        setOrderStatus(builder.orderStatus);
+    }
+
+    public static boolean orderIsABuy(Order order) {
+        return OrderSide.BUY.equals(order.getSide());
+    }
+
+    public static boolean orderIsASell(Order order) {
+        return OrderSide.SELL.equals(order.getSide());
     }
 
     public static Builder newBuilder() {
@@ -65,6 +60,7 @@ public class Order {
 
     public static Builder newBuilder(final Order copy) {
         Builder builder = new Builder();
+        builder.id = copy.getId();
         builder.symbol = copy.getSymbol();
         builder.quantity = copy.getQuantity();
         builder.price = copy.getPrice();
@@ -75,16 +71,16 @@ public class Order {
         builder.strategy = copy.getStrategy();
         builder.orderTrigger = copy.getOrderTrigger();
         builder.triggerDirection = copy.getTriggerDirection();
-
+        builder.orderStatus = copy.getOrderStatus();
         return builder;
     }
 
-    public static boolean orderIsASell(final Order order) {
-        return SELL.equals(order.getSide());
+    public Long getId() {
+        return id;
     }
 
-    public static boolean orderIsABuy(final Order order) {
-        return BUY.equals(order.getSide());
+    public void setId(final Long id) {
+        this.id = id;
     }
 
     public String getSymbol() {
@@ -100,7 +96,6 @@ public class Order {
     }
 
     public void setQuantity(final BigDecimal quantity) {
-        this.value = null;
         this.quantity = quantity;
     }
 
@@ -109,13 +104,11 @@ public class Order {
     }
 
     public void setPrice(final BigDecimal price) {
-        this.value = null;
         this.price = price;
-        this.priceString = (price != null) ? price.toString() : "";
     }
 
     public BigDecimal getValue() {
-        value = this.getQuantity().multiply(this.getPrice());
+        value = getPrice().multiply(getQuantity());
         return value;
     }
 
@@ -163,35 +156,6 @@ public class Order {
         this.orderTrigger = orderTrigger;
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("orderId", orderId)
-                .addValue(triggerDirection)
-                .addValue(strategy)
-                .add("quantity", quantity)
-                .add("price", price)
-                .add("value", value)
-                .add("side", side)
-                .toString();
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
-        return Objects.equal(getSymbol(),
-                order.getSymbol()) && Objects.equal(getQuantity(), order.getQuantity()) && Objects.equal(getPrice(),
-                order.getPrice()) && getSide() == order.getSide() && getTimeInForce() == order.getTimeInForce() && Objects.equal(getOrderId(), order.getOrderId()) && Objects.equal(getStrategy(), order.getStrategy()) && getOrderTrigger() == order.getOrderTrigger() && getTriggerDirection() == order.getTriggerDirection();
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getSymbol(), getQuantity(), getPrice(), getSide(), getTimeInForce(), getOrderId(),
-                getStrategy(), getOrderTrigger(), getTriggerDirection());
-    }
-
     public TriggerDirection getTriggerDirection() {
         return triggerDirection;
     }
@@ -200,10 +164,38 @@ public class Order {
         this.triggerDirection = triggerDirection;
     }
 
-    public String getPriceString() {
-        return priceString;
+    public String getOrderStatus() {
+        return orderStatus;
     }
 
+    public void setOrderStatus(final String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public Boolean getWasTraded() {
+        return wasTraded;
+    }
+
+    public void setWasTraded(final Boolean wasTraded) {
+        this.wasTraded = wasTraded;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .addValue(symbol)
+                .addValue(orderId)
+                .addValue(side)
+                .addValue(quantity)
+                .addValue(price)
+                .add("value", getValue())
+                .add("triggerDirection", triggerDirection)
+                .toString();
+    }
+
+    /**
+     * {@code Order} builder static inner class.
+     */
     public enum OrderSide {BUY, SELL}
 
     public enum OrderTrigger {
@@ -225,18 +217,31 @@ public class Order {
      * {@code Order} builder static inner class.
      */
     public static final class Builder {
+        private Long id;
         private String symbol;
         private BigDecimal quantity;
         private BigDecimal price;
         private BigDecimal value;
         private OrderSide side;
-        private TimeInForce timeInForce = TimeInForce.GTC;
+        private TimeInForce timeInForce;
         private String orderId;
         private String strategy;
         private OrderTrigger orderTrigger;
-        private TriggerDirection triggerDirection = TriggerDirection.NA;
+        private TriggerDirection triggerDirection;
+        private String orderStatus;
 
         private Builder() {
+        }
+
+        /**
+         * Sets the {@code id} and returns a reference to this Builder so that the methods can be chained together.
+         *
+         * @param id the {@code id} to set
+         * @return a reference to this Builder
+         */
+        public Builder setId(final Long id) {
+            this.id = id;
+            return this;
         }
 
         /**
@@ -351,6 +356,18 @@ public class Order {
          */
         public Builder setTriggerDirection(final TriggerDirection triggerDirection) {
             this.triggerDirection = triggerDirection;
+            return this;
+        }
+
+        /**
+         * Sets the {@code orderStatus} and returns a reference to this Builder so that the methods can be chained
+         * together.
+         *
+         * @param orderStatus the {@code orderStatus} to set
+         * @return a reference to this Builder
+         */
+        public Builder setOrderStatus(final String orderStatus) {
+            this.orderStatus = orderStatus;
             return this;
         }
 

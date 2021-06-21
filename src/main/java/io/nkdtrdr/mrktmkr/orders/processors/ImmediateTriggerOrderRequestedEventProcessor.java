@@ -38,6 +38,7 @@ public class ImmediateTriggerOrderRequestedEventProcessor implements EventProces
                 && order.getOrderTrigger().equals(Order.OrderTrigger.IMMEDIATE)
         ) {
             if (ordersFacade.canPlaceOrder(order) && !strategyFacade.isLocked(order.getStrategy())) {
+                order.setWasTraded(true);
                 strategyFacade.setLocked(true);
                 processMediator.placeOrder(order);
                 ordersFacade.trackOpenOrder(order);

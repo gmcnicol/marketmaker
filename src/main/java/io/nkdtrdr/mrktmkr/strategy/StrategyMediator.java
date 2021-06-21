@@ -48,7 +48,12 @@ public class StrategyMediator {
 
     public void setActiveTradingStrategy(String strategyName) {
         activationTracker.setCandidateStrategy(strategyName);
+
+        if (!strategyName.equals(activeTradingStrategy.getName())) {
+            setLocked(true);
+        }
         if (activationTracker.canActivateStrategy(strategyName)) {
+            setLocked(false);
             this.activeTradingStrategy.setInnerStrategy((KdTradingStrategy) tradingStrategyRepository.strategyByName(
                     strategyName));
         }
@@ -131,6 +136,6 @@ public class StrategyMediator {
     }
 
     public void setLocked(final boolean locked) {
-        this.tradingStrategyRepository.all().forEach(s-> s.setLocked(locked));
+        this.tradingStrategyRepository.all().forEach(s -> s.setLocked(locked));
     }
 }

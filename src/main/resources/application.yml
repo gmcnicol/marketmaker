@@ -1,20 +1,24 @@
 spring:
-  redis:
-    database: 0
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-    timeout: 60000
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    url: jdbc:postgresql://db:5432/mrktmkr
+    username: mrktmkr
+    password: secret
+  flyway:
+    enabled: true
   application:
     name: MrktMkr
+  jpa:
+    hibernate:
+      ddl-auto: validate
 
 logging:
   level:
     root: WARN
 
     io.nkdtrdr.mrktmkr: DEBUG
-
-
-
 symbol:
   base: BTC
   quote: GBP

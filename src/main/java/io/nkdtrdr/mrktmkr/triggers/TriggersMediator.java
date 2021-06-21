@@ -49,7 +49,7 @@ public class TriggersMediator {
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6,
                             RoundingMode.CEILING);
 
-            BigDecimal margin = valueOf(0.9997);
+            BigDecimal margin = valueOf(0.9999);
             BigDecimal newValue = netValue.multiply(margin);
             BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
 
@@ -62,19 +62,20 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-            margin = valueOf(1.001);
-            newPrice = new BigDecimal(orderStrings.originalPrice).multiply(margin);
-
-            orderBuilder = Order.newBuilder(order);
-            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
-            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-            orderBuilder.setPrice(newPrice);
-            orderBuilder.setQuantity(grossQuantity);
-            orderBuilder.setSide(Order.OrderSide.BUY);
-            orderBuilder.setOrderId(orderId);
-
-            final Order bailOrder = orderBuilder.build();
-            return Set.of(targetOrder, bailOrder);
+//            margin = valueOf(1.012);
+//            newPrice = new BigDecimal(orderStrings.originalPrice).multiply(margin);
+//
+//            orderBuilder = Order.newBuilder(order);
+//            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
+//            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
+//            orderBuilder.setPrice(newPrice);
+//            orderBuilder.setQuantity(grossQuantity);
+//            orderBuilder.setSide(Order.OrderSide.BUY);
+//            orderBuilder.setOrderId(orderId);
+//
+//            final Order bailOrder = orderBuilder.build();
+//            return Set.of(targetOrder, bailOrder);
+            return Set.of(targetOrder);
         }
         return Set.of();
     }
@@ -88,10 +89,11 @@ public class TriggersMediator {
                     ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
-                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6, RoundingMode.FLOOR);
+                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6,
+                            RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
-            BigDecimal margin = valueOf(1.0003);
+            BigDecimal margin = valueOf(1.0001);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
             BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
@@ -106,17 +108,17 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-            margin = valueOf(0.999);
-            price = new BigDecimal(orderStrings.originalPrice).multiply(margin);
-            orderBuilder = Order.newBuilder(order);
-            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
-            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-            orderBuilder.setPrice(price);
-            orderBuilder.setQuantity(netQuantity);
-            orderBuilder.setSide(Order.OrderSide.SELL);
-            orderBuilder.setOrderId(orderId);
-            final Order bailOrder = orderBuilder.build();
-            return Set.of(targetOrder, bailOrder);
+//            margin = valueOf(0.988);
+//            price = new BigDecimal(orderStrings.originalPrice).multiply(margin);
+//            orderBuilder = Order.newBuilder(order);
+//            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
+//            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
+//            orderBuilder.setPrice(price);
+//            orderBuilder.setQuantity(netQuantity);
+//            orderBuilder.setSide(Order.OrderSide.SELL);
+//            orderBuilder.setOrderId(orderId);
+//            final Order bailOrder = orderBuilder.build();
+            return Set.of(targetOrder);//, bailOrder);
         }
         return Set.of();
     }
@@ -150,6 +152,5 @@ public class TriggersMediator {
                     order.getPrice().toString(),
                     order.getQuantity().toString());
         }
-
     }
 }

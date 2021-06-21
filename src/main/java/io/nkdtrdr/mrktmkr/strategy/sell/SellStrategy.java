@@ -67,10 +67,9 @@ public class SellStrategy implements KdTradingStrategy {
         final Predicate<KdValue> kGreaterThanTwenty = kdValue -> kdValue.getkValue().compareTo(TWENTY) > 0;
         final Predicate<KdValue> dGreaterThanThirty = kdValue -> kdValue.getkValue().compareTo(THIRTY) > 0;
 
-        canPlaceOrderPredicate = kGreaterThanTwenty
+        canPlaceOrderPredicate = greaterThanEighty
                 .and(kLessThanPreviousK)
                 .and(kLessThanD)
-                .and(dGreaterThanThirty)
         ;
 
         this.canAffordPredicate = o -> o.getValue().compareTo(valueOf(10.10D)) >= 0;

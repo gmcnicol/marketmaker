@@ -3,7 +3,6 @@ package io.nkdtrdr.mrktmkr.persistence;
 import io.nkdtrdr.mrktmkr.dto.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 
@@ -16,22 +15,17 @@ public class PersistenceFacade {
     }
 
     public void trackOrder(Order order) {
-        if (orderRepository.existsById(order.getValue())) {
-            //noinspection OptionalGetWithoutIsPresent
-            final Order existingOrder = orderRepository.findById(order.getValue()).get();
-            order.setQuantity(existingOrder.getQuantity().add(order.getQuantity()));
-        }
         orderRepository.save(order);
     }
 
     public void stopTrackingOrderId(String orderId) {
-        orderRepository.removeByOrderId(orderId);
+        orderRepository.findOrdersByOrderIdEquals(orderId).forEach(order -> {
+            order.setOrderStatus("complete");
+            orderRepository.save(order);
+        });
     }
 
     public Collection<Order> getAllOrders() {
-        final ArrayList<Order> result = new ArrayList<>();
-        final Iterable<Order> all = orderRepository.findAll();
-        all.forEach(result::add);
-        return result;
+        return orderRepository.findOrdersByOrderStatusIsNull();
     }
 }
