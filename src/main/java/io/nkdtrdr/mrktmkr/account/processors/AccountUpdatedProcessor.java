@@ -6,17 +6,21 @@ import io.nkdtrdr.mrktmkr.account.AccountFacade;
 import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
+import io.nkdtrdr.mrktmkr.persistence.PersistenceFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.function.Consumer;
 
+
 @Component
 public class AccountUpdatedProcessor implements EventProcessor {
     private final AccountFacade accountFacade;
+    private final PersistenceFacade persistenceFacade;
 
-    public AccountUpdatedProcessor(AccountFacade accountFacade) {
+    public AccountUpdatedProcessor(AccountFacade accountFacade, final PersistenceFacade persistenceFacade) {
         this.accountFacade = accountFacade;
+        this.persistenceFacade = persistenceFacade;
     }
 
     @Override
@@ -29,5 +33,6 @@ public class AccountUpdatedProcessor implements EventProcessor {
         AccountUpdateEvent accountUpdateEvent = (AccountUpdateEvent) makerEvent.getEventEnvelope().getPayload();
         final List<AssetBalance> balances = accountUpdateEvent.getBalances();
         accountFacade.setAccountBalances(balances);
+        persistenceFacade.saveAssets(balances);
     }
 }
