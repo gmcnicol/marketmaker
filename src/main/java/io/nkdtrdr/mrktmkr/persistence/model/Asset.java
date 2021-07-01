@@ -17,7 +17,7 @@ public class Asset {
     private BigDecimal value;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
     private Long id;
 
     public static Asset convert(AssetBalance assetBalance) {

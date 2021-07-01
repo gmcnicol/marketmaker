@@ -28,7 +28,7 @@ public class App {
 
         final ProcessMediator bean = applicationContext.getBean(ProcessMediator.class);
         bean.start();
-        LOGGER.info("App be runnin'");
+        LOGGER.warn("App be runnin'");
     }
 
     @Bean

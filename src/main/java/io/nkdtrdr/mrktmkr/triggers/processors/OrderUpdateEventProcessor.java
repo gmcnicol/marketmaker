@@ -8,6 +8,7 @@ import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import io.nkdtrdr.mrktmkr.dto.Order;
+import io.nkdtrdr.mrktmkr.symbols.Symbol;
 import io.nkdtrdr.mrktmkr.triggers.TriggersFacade;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +23,12 @@ import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
 public class OrderUpdateEventProcessor implements EventProcessor {
     private final TradeAudit tradeAudit;
     private final TriggersFacade triggersFacade;
+    private final Symbol symbol;
 
-    public OrderUpdateEventProcessor(TradeAudit tradeAudit, TriggersFacade triggersFacade) {
+    public OrderUpdateEventProcessor(TradeAudit tradeAudit, TriggersFacade triggersFacade, final Symbol symbol) {
         this.tradeAudit = tradeAudit;
         this.triggersFacade = triggersFacade;
+        this.symbol = symbol;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class OrderUpdateEventProcessor implements EventProcessor {
             tradeAudit.auditOrder(event);
             if (event.getNewClientOrderId().startsWith("F")) return;
             final Order order = Order.newBuilder()
-                    .setSymbol("BTCGBP")
+                    .setSymbol(symbol.getSymbol())
                     .setOrderId(event.getNewClientOrderId())
                     .setSide(event.getSide().equals(OrderSide.SELL)
                             ? Order.OrderSide.SELL

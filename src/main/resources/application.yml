@@ -18,22 +18,21 @@ logging:
   level:
     root: WARN
 
-    io.nkdtrdr.mrktmkr: DEBUG
+    io.nkdtrdr.mrktmkr: WARN
+    io.nkdtrdr.mrktmkr.disruptor: DEBUG
 symbol:
-  base: BTC
+  base: DOGE
   quote: GBP
   minimum-order: 10.10
-  order-price-adjustment: 0.01
-
+  order-price-adjustment: 0.0001
 binance:
   api-key: ${BINANCE_API_KEY}
   api-secret: ${BINANCE_API_SECRET}
-
 strategy:
   limits:
     - strategy: BUY
       asset: GBP
-      asset-cap: 50
+      asset-cap: 20
     - strategy: SELL
-      asset: BTC
-      asset-cap: 0.001
+      asset: DOGE
+      asset-cap: 100
