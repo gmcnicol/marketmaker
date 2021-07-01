@@ -2,6 +2,7 @@ package io.nkdtrdr.mrktmkr.triggers;
 
 import io.nkdtrdr.mrktmkr.account.AccountFacade;
 import io.nkdtrdr.mrktmkr.dto.Order;
+import io.nkdtrdr.mrktmkr.symbols.Symbol;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -20,9 +21,11 @@ import static java.time.LocalDateTime.now;
 public class TriggersMediator {
     private static final BigDecimal MINIMUM_ORDER = valueOf(10.10);
     private final AccountFacade accountFacade;
+    private final Symbol symbol;
 
-    public TriggersMediator(AccountFacade accountFacade) {
+    public TriggersMediator(AccountFacade accountFacade, final Symbol symbol) {
         this.accountFacade = accountFacade;
+        this.symbol = symbol;
     }
 
     public Collection<Order> getTriggersForOrder(Order order) {
@@ -46,7 +49,7 @@ public class TriggersMediator {
 
             final BigDecimal buyCommission = ONE.add(getBuyCommission());
             final BigDecimal grossQuantity =
-                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6,
+                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getScale(),
                             RoundingMode.CEILING);
 
             BigDecimal margin = valueOf(0.99995);
@@ -89,7 +92,7 @@ public class TriggersMediator {
                     ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
-                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(6,
+                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getScale(),
                             RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());

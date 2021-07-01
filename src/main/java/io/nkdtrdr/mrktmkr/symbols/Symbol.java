@@ -24,6 +24,9 @@ public class Symbol {
     @Value("${symbol.order-price-adjustment}")
     private BigDecimal orderPriceAdjustment;
 
+    @Value("${symbol.scale}")
+    private Integer scale;
+
     public String getBaseSymbol() {
         return baseSymbol;
     }
@@ -85,5 +88,13 @@ public class Symbol {
                 .add("minimumOrderValue", minimumOrderValue)
                 .add("orderPriceAdjustment", orderPriceAdjustment)
                 .toString();
+    }
+
+    public Integer getScale() {
+        return scale;
+    }
+
+    public void setScale(final Integer scale) {
+        this.scale = scale;
     }
 }
