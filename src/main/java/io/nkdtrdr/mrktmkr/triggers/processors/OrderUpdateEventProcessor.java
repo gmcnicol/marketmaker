@@ -52,7 +52,8 @@ public class OrderUpdateEventProcessor implements EventProcessor {
                     .setSide(event.getSide().equals(OrderSide.SELL)
                             ? Order.OrderSide.SELL
                             : Order.OrderSide.BUY)
-                    .setQuantity(getBigDecimal(event.getQuantityLastFilledTrade()).setScale(6, RoundingMode.FLOOR))
+                    .setQuantity(getBigDecimal(event.getQuantityLastFilledTrade()).setScale(symbol.getScale(),
+                            RoundingMode.FLOOR))
                     .setPrice(getBigDecimal(event.getPriceOfLastFilledTrade()))
                     .build();
             triggersFacade.createTriggersForOrder(order, resultHandler);

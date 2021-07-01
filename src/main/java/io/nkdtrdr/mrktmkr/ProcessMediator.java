@@ -208,7 +208,7 @@ public class ProcessMediator {
 
         final NewOrder newOrder = BinanceOrderFactory.limitBuy(order.getSymbol(),
                 order.getPrice(),
-                order.getQuantity().setScale(6, RoundingMode.FLOOR))
+                order.getQuantity().setScale(symbol.getScale(), RoundingMode.FLOOR))
                 .newClientOrderId(order.getOrderId());
         placeOrder(newOrder);
     }
@@ -217,7 +217,7 @@ public class ProcessMediator {
 
         final NewOrder newOrder = BinanceOrderFactory.limitSell(order.getSymbol(),
                 order.getPrice(),
-                order.getQuantity().setScale(6, RoundingMode.FLOOR))
+                order.getQuantity().setScale(symbol.getScale(), RoundingMode.FLOOR))
                 .newClientOrderId(order.getOrderId());
         placeOrder(newOrder);
     }

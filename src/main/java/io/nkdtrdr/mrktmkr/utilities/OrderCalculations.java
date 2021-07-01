@@ -75,14 +75,13 @@ public class OrderCalculations {
      *
      * @return the quantity
      */
-    public BigDecimal getQuantity() {
+    public BigDecimal getQuantity(int scale) {
         if (quantity != null) {
             return quantity;
         }
         if (cost == null || ((price == null) || (price.compareTo(ZERO) == 0))) return ZERO;
-        final BigDecimal q = cost.divide(price, 6, rounding);
-        final BigDecimal apply = modifier.apply(q);
-        return apply;
+        final BigDecimal q = cost.divide(price, scale, rounding);
+        return modifier.apply(q);
     }
 
     /**
@@ -115,7 +114,7 @@ public class OrderCalculations {
     @Override
     public String toString() {
         return "OrderCalculations{" +
-                "quantity=" + getQuantity() +
+                "quantity=" + getQuantity(8) +
                 ", price=" + getPrice() +
                 ", cost=" + getCost() +
                 ", rounding=" + rounding +

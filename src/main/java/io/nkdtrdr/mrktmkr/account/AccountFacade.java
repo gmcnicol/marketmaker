@@ -36,16 +36,6 @@ public class AccountFacade {
         return VALUE_CAP;
     }
 
-    private BigDecimal valueCapInBTC(final BigDecimal bigDecimal) {
-        final BigDecimal maxQ = aCalculator().withCost(VALUE_CAP)
-                .withRounding(RoundingMode.CEILING)
-                .withPrice(ordersFacade.getBestBidPrice())
-                .withModifier(q -> q.multiply(ONE.add(valueOf(0.003))))
-                .getQuantity();
-
-        return maxQ.min(bigDecimal);
-    }
-
     public void initialiseAccount(Account account) {
         accountMediator.initialiseAccount(account);
     }

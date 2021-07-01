@@ -71,7 +71,7 @@ public class StrategyMediator {
                             : limitForAssetAndStrategy.getAssetCap();
 
             final BigDecimal price = getBestAskPrice().add(symbol.getOrderPriceAdjustment());
-            final BigDecimal quantity = gbp.divide(price, 6, RoundingMode.FLOOR);
+            final BigDecimal quantity = gbp.divide(price, symbol.getScale(), RoundingMode.FLOOR);
             initialOrder.setPrice(price);
             initialOrder.setQuantity(quantity);
         }
@@ -84,7 +84,7 @@ public class StrategyMediator {
                     .withPrice(getBestBidPrice().subtract(symbol.getOrderPriceAdjustment()))
                     .withCost(AccountFacade.VALUE_CAP)
                     .withRounding(RoundingMode.CEILING)
-                    .getQuantity();
+                    .getQuantity(symbol.getScale());
 
             final BigDecimal quantity = limitForAssetAndStrategy == null
                     ? getFreeBalanceForAsset(symbol.getBaseSymbol()).min(maxQuantity)
