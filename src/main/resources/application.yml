@@ -24,9 +24,9 @@ symbol:
   base: DOGE
   quote: GBP
   minimum-order: 10.10
-  order-price-adjustment: 0.0001
+  order-price-adjustment: 0.00001
   base-scale: 1
-  quote-scale: 4
+  quote-scale: 5
 binance:
   api-key: ${BINANCE_API_KEY}
   api-secret: ${BINANCE_API_SECRET}
