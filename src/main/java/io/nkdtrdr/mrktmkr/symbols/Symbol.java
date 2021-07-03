@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+import static com.google.common.base.Objects.equal;
 import static java.lang.String.format;
 
 
@@ -24,8 +25,11 @@ public class Symbol {
     @Value("${symbol.order-price-adjustment}")
     private BigDecimal orderPriceAdjustment;
 
-    @Value("${symbol.scale}")
+    @Value("${symbol.base-scale}")
     private Integer baseScale;
+
+    @Value("${symbol.quote-scale}")
+    private Integer quoteScale;
 
     public String getBaseSymbol() {
         return baseSymbol;
@@ -71,13 +75,36 @@ public class Symbol {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Symbol symbol = (Symbol) o;
-        return Objects.equal(getBaseSymbol(), symbol.getBaseSymbol()) && Objects.equal(getQuoteSymbol(),
-                symbol.getQuoteSymbol()) && Objects.equal(getMinimumOrderValue(), symbol.getMinimumOrderValue()) && Objects.equal(getOrderPriceAdjustment(), symbol.getOrderPriceAdjustment());
+        return equal(getBaseSymbol(), symbol.getBaseSymbol())
+                && equal(getQuoteSymbol(), symbol.getQuoteSymbol())
+                && equal(getMinimumOrderValue(), symbol.getMinimumOrderValue())
+                && equal(getOrderPriceAdjustment(), symbol.getOrderPriceAdjustment());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getBaseSymbol(), getQuoteSymbol(), getMinimumOrderValue(), getOrderPriceAdjustment());
+        return Objects.hashCode(getBaseSymbol(),
+                getQuoteSymbol(),
+                getMinimumOrderValue(),
+                getOrderPriceAdjustment(),
+                getBaseScale(),
+                getQuoteScale());
+    }
+
+    public Integer getBaseScale() {
+        return baseScale;
+    }
+
+    public void setBaseScale(final Integer baseScale) {
+        this.baseScale = baseScale;
+    }
+
+    public Integer getQuoteScale() {
+        return quoteScale;
+    }
+
+    public void setQuoteScale(final Integer quoteScale) {
+        this.quoteScale = quoteScale;
     }
 
     @Override
@@ -87,14 +114,8 @@ public class Symbol {
                 .add("quoteSymbol", quoteSymbol)
                 .add("minimumOrderValue", minimumOrderValue)
                 .add("orderPriceAdjustment", orderPriceAdjustment)
+                .add("baseScale", baseScale)
+                .add("quoteScale", quoteScale)
                 .toString();
-    }
-
-    public Integer getBaseScale() {
-        return baseScale;
-    }
-
-    public void setBaseScale(final Integer baseScale) {
-        this.baseScale = baseScale;
     }
 }

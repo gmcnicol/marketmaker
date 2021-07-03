@@ -45,14 +45,16 @@ public class TriggersMediator {
 
             final BigDecimal saleCommission = ONE.subtract(getSaleCommission());
             BigDecimal netValue =
-                    new BigDecimal(orderStrings.originalValue).multiply(saleCommission).setScale(2, RoundingMode.FLOOR);
+                    new BigDecimal(orderStrings.originalValue)
+                            .multiply(saleCommission)
+                            .setScale(symbol.getQuoteScale(), RoundingMode.FLOOR);
 
             final BigDecimal buyCommission = ONE.add(getBuyCommission());
             final BigDecimal grossQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.CEILING);
 
-            BigDecimal margin = valueOf(0.99995);
+            BigDecimal margin = valueOf(0.9999);
             BigDecimal newValue = netValue.multiply(margin);
             BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
 
@@ -89,17 +91,17 @@ public class TriggersMediator {
 
             order.setStrategy("BUY");
             final BigDecimal buyCommission =
-                    ONE.subtract(getBuyCommission()).setScale(4, RoundingMode.FLOOR);
+                    ONE.subtract(getBuyCommission()).setScale(symbol.getQuoteScale(), RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
-            BigDecimal margin = valueOf(1.00005);
+            BigDecimal margin = valueOf(1.0001);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
-            BigDecimal price = adjustedValue.divide(netQuantity, 2, RoundingMode.CEILING);
+            BigDecimal price = adjustedValue.divide(netQuantity, symbol.getQuoteScale(), RoundingMode.CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);

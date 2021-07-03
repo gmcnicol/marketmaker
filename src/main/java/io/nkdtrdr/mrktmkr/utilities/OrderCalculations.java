@@ -11,6 +11,7 @@ import static java.math.BigDecimal.ZERO;
  * The type Order calculations.
  */
 public class OrderCalculations {
+    public static final int DEFAULT_SCALE = 8;
     private BigDecimal quantity;
     private BigDecimal price;
     private BigDecimal cost;
@@ -89,12 +90,12 @@ public class OrderCalculations {
      *
      * @return the price
      */
-    public BigDecimal getPrice() {
+    public BigDecimal getPrice(int scale) {
         if (price != null) {
             return price;
         }
         return (cost == null || (quantity == null || quantity.compareTo(ZERO) == 0)) ? ZERO :
-                modifier.apply(cost.divide(quantity, 2,
+                modifier.apply(cost.divide(quantity, scale,
                         rounding));
     }
 
@@ -114,8 +115,8 @@ public class OrderCalculations {
     @Override
     public String toString() {
         return "OrderCalculations{" +
-                "quantity=" + getQuantity(8) +
-                ", price=" + getPrice() +
+                "quantity=" + getQuantity(DEFAULT_SCALE) +
+                ", price=" + getPrice(DEFAULT_SCALE) +
                 ", cost=" + getCost() +
                 ", rounding=" + rounding +
                 '}';
