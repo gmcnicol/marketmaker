@@ -52,7 +52,7 @@ public class OrderUpdateEventProcessor implements EventProcessor {
                     .setSide(event.getSide().equals(OrderSide.SELL)
                             ? Order.OrderSide.SELL
                             : Order.OrderSide.BUY)
-                    .setQuantity(getBigDecimal(event.getQuantityLastFilledTrade()).setScale(symbol.getScale(),
+                    .setQuantity(getBigDecimal(event.getQuantityLastFilledTrade()).setScale(symbol.getBaseScale(),
                             RoundingMode.FLOOR))
                     .setPrice(getBigDecimal(event.getPriceOfLastFilledTrade()))
                     .build();

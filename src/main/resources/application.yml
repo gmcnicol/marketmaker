@@ -25,7 +25,8 @@ symbol:
   quote: GBP
   minimum-order: 10.10
   order-price-adjustment: 0.0001
-  scale: 1
+  base-scale: 1
+  quote-scale: 4
 binance:
   api-key: ${BINANCE_API_KEY}
   api-secret: ${BINANCE_API_SECRET}
@@ -36,4 +37,4 @@ strategy:
       asset-cap: 20
     - strategy: SELL
       asset: DOGE
-      asset-cap: 100
+      asset-cap: 110
