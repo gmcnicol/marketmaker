@@ -54,7 +54,7 @@ public class TriggersMediator {
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.CEILING);
 
-            BigDecimal margin = valueOf(0.9999);
+            BigDecimal margin = valueOf(0.99995);
             BigDecimal newValue = netValue.multiply(margin);
             BigDecimal newPrice = newValue.divide(grossQuantity, symbol.getQuoteScale(), RoundingMode.FLOOR);
 
@@ -98,7 +98,7 @@ public class TriggersMediator {
                             RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
-            BigDecimal margin = valueOf(1.0001);
+            BigDecimal margin = valueOf(1.00005);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
             BigDecimal price = adjustedValue.divide(netQuantity, symbol.getQuoteScale(), RoundingMode.CEILING);
