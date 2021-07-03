@@ -56,7 +56,7 @@ public class TriggersMediator {
 
             BigDecimal margin = valueOf(0.9999);
             BigDecimal newValue = netValue.multiply(margin);
-            BigDecimal newPrice = newValue.divide(grossQuantity, 2, RoundingMode.FLOOR);
+            BigDecimal newPrice = newValue.divide(grossQuantity, symbol.getQuoteScale(), RoundingMode.FLOOR);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);

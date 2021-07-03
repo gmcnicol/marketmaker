@@ -94,9 +94,9 @@ public class OrderCalculations {
         if (price != null) {
             return price;
         }
-        return (cost == null || (quantity == null || quantity.compareTo(ZERO) == 0)) ? ZERO :
-                modifier.apply(cost.divide(quantity, scale,
-                        rounding));
+        return (cost == null || (quantity == null || quantity.compareTo(ZERO) == 0))
+                ? ZERO
+                : modifier.apply(cost.divide(quantity, scale, rounding));
     }
 
     /**
@@ -104,12 +104,13 @@ public class OrderCalculations {
      *
      * @return the cost
      */
-    public BigDecimal getCost() {
+    public BigDecimal getCost(int scale) {
         if (cost != null) {
             return cost;
         }
-        return (price == null || quantity == null) ? ZERO : modifier.apply(price.multiply(quantity)).setScale(2,
-                rounding);
+        return (price == null || quantity == null)
+                ? ZERO
+                : modifier.apply(price.multiply(quantity)).setScale(scale, rounding);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class OrderCalculations {
         return "OrderCalculations{" +
                 "quantity=" + getQuantity(DEFAULT_SCALE) +
                 ", price=" + getPrice(DEFAULT_SCALE) +
-                ", cost=" + getCost() +
+                ", cost=" + getCost(DEFAULT_SCALE) +
                 ", rounding=" + rounding +
                 '}';
     }
