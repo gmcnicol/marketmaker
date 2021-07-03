@@ -20,6 +20,7 @@ logging:
 
     io.nkdtrdr.mrktmkr: WARN
     io.nkdtrdr.mrktmkr.disruptor: DEBUG
+    io.nkdtrdr.mrktmkr.orders: DEBUG
 symbol:
   base: DOGE
   quote: GBP
