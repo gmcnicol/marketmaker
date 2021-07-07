@@ -3,6 +3,7 @@ package io.nkdtrdr.mrktmkr.strategy;
 import io.nkdtrdr.mrktmkr.account.AccountFacade;
 import io.nkdtrdr.mrktmkr.analysis.model.KdValue;
 import io.nkdtrdr.mrktmkr.dto.Order;
+import io.nkdtrdr.mrktmkr.dto.SymbolStats;
 import io.nkdtrdr.mrktmkr.limits.Limit;
 import io.nkdtrdr.mrktmkr.limits.LimitsRepository;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
@@ -27,6 +28,7 @@ public class StrategyMediator {
     private final Symbol symbol;
     private final LimitsRepository limitsRepository;
     private final ActivationTracker activationTracker;
+    private SymbolStats symbolStatistics;
 
     public StrategyMediator(final TradingStrategyRepository<KdValue> tradingStrategyRepository,
                             final OrdersFacade ordersFacade,
@@ -137,5 +139,17 @@ public class StrategyMediator {
 
     public void setLocked(final boolean locked) {
         this.tradingStrategyRepository.all().forEach(s -> s.setLocked(locked));
+    }
+
+    public void setSymbolStatistics(final SymbolStats stats) {
+        symbolStatistics = stats;
+    }
+
+    public BigDecimal getHighPrice() {
+        return symbolStatistics.getHighPrice();
+    }
+
+    public BigDecimal getLowPrice() {
+        return symbolStatistics.getLowPrice();
     }
 }

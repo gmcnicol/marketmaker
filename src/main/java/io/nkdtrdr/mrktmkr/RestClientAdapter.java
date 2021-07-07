@@ -98,7 +98,6 @@ public class RestClientAdapter {
     }
 
     public void getSymbolStats(Symbol symbol) {
-        restClient.get24HrPriceStatistics(symbol.getSymbol(),
-                tickerStatistics -> processMediator.processEvent("SYMBOL_STATS_UPDATED", tickerStatistics));
+        restClient.get24HrPriceStatistics(symbol.getSymbol(), processMediator::onTickerStatisticsReceived);
     }
 }

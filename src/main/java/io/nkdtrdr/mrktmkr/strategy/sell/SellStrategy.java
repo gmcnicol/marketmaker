@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -31,6 +32,7 @@ public class SellStrategy implements KdTradingStrategy {
     private final Predicate<KdValue> longSymbolMatches;
     private final Map<String, KdValue> previousKdValue = new HashMap<>();
     private final Predicate<KdValue> shortTermSymbolMatches;
+    private final Predicate<BigDecimal> pricePredicate;
     private boolean canBeActivated;
     private boolean canPlaceASell;
     private StrategyMediator mediator;
@@ -72,6 +74,10 @@ public class SellStrategy implements KdTradingStrategy {
                 .and(kLessThanD)
         ;
 
+        pricePredicate = price ->
+                price.subtract(mediator.getLowPrice())
+                        .divide(mediator.getHighPrice().subtract(mediator.getLowPrice()), 2, RoundingMode.HALF_EVEN)
+                        .compareTo(valueOf(0.30D)) > 0;
         this.canAffordPredicate = o -> o.getValue().compareTo(valueOf(10.10D)) >= 0;
     }
 
@@ -98,7 +104,9 @@ public class SellStrategy implements KdTradingStrategy {
     public boolean canPlaceOrder(final Order order) {
         final boolean canAfford = canAffordPredicate.test(order);
         return STRATEGY_NAME.equals(order.getStrategy())
-                && order.getSide().equals(Order.OrderSide.SELL) && canPlaceASell && canAfford;
+                && order.getSide().equals(Order.OrderSide.SELL) && canPlaceASell && canAfford
+                && pricePredicate.test(order.getPrice())
+                ;
     }
 
     @Override

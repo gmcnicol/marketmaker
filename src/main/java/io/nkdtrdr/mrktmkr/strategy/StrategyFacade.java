@@ -2,6 +2,7 @@ package io.nkdtrdr.mrktmkr.strategy;
 
 import io.nkdtrdr.mrktmkr.analysis.model.KdValue;
 import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
+import io.nkdtrdr.mrktmkr.dto.SymbolStats;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -56,5 +57,9 @@ public class StrategyFacade {
 
     public void setLocked(final boolean locked) {
         strategyMediator.setLocked(locked);
+    }
+
+    public void setSymbolStatistics(final SymbolStats stats) {
+        strategyMediator.setSymbolStatistics(stats);
     }
 }

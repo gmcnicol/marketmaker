@@ -7,6 +7,7 @@ import com.binance.api.client.domain.event.DepthEvent;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.api.client.domain.market.OrderBook;
+import com.binance.api.client.domain.market.TickerStatistics;
 import com.google.common.collect.ImmutableMap;
 import com.lmax.disruptor.EventTranslatorTwoArg;
 import com.lmax.disruptor.dsl.Disruptor;
@@ -15,6 +16,7 @@ import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import io.nkdtrdr.mrktmkr.dto.CandleStickDTO;
 import io.nkdtrdr.mrktmkr.dto.CandleStickInitialisedEvent;
 import io.nkdtrdr.mrktmkr.dto.Order;
+import io.nkdtrdr.mrktmkr.dto.SymbolStats;
 import io.nkdtrdr.mrktmkr.monitoring.Monitor;
 import io.nkdtrdr.mrktmkr.orderbook.OrderBookRepository;
 import io.nkdtrdr.mrktmkr.orders.BinanceOrderFactory;
@@ -90,6 +92,7 @@ public class ProcessMediator {
     public void start() {
         LOGGER.info("Initialising");
         persistenceFacade.getAllOrders().forEach(ordersFacade::addOrderToBeTriggered);
+        restClient.getSymbolStats(symbol);
         restClient.startUserStream();
         restClient.getAccount();
         //restClient.getCandleStick(symbol.getSymbol().toUpperCase(Locale.ROOT), CandlestickInterval.FIVE_MINUTES);
@@ -133,12 +136,12 @@ public class ProcessMediator {
         if (minutes >= 2) {
             System.exit(-1);
         }
+        restClient.getSymbolStats(this.symbol);
     }
 
     @Scheduled(cron = "25 7/30 * * * *")
     public void refreshUserFeed() {
         restClient.refreshUserStream(this.listenKey);
-        restClient.getSymbolStats(this.symbol);
     }
 
     public void processKeyEvent(String eventName, String eventKey, Object payload) {
@@ -232,5 +235,10 @@ public class ProcessMediator {
 
     public void setLastTickerUpdate(final long lastTickerUpdate) {
         monitor.setLastTickerUpdate(lastTickerUpdate);
+    }
+
+    public void onTickerStatisticsReceived(TickerStatistics tickerStatistics) {
+        final SymbolStats symbolStats = modelMapper.map(tickerStatistics, SymbolStats.class);
+        this.processEvent("SYMBOL_STATS_UPDATED", symbolStats);
     }
 }

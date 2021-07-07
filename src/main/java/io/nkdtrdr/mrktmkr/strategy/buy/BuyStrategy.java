@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -31,6 +32,7 @@ public class BuyStrategy implements KdTradingStrategy {
     private final Map<String, KdValue> previousKdValue = new HashMap<>();
     private final Predicate<KdValue> longSymbolMatches;
     private final Predicate<KdValue> symbolMatches;
+    private final Predicate<BigDecimal> pricePredicate;
     private boolean canBeActivated;
     private boolean canPlaceABuy;
     private StrategyMediator mediator;
@@ -49,12 +51,19 @@ public class BuyStrategy implements KdTradingStrategy {
         Predicate<KdValue> dLessThanSeventy = kdValue -> kdValue.getdValue().compareTo(SEVENTY) < 0;
 
         Predicate<KdValue> dLessThanThirty = kdValue -> kdValue.getdValue().compareTo(valueOf(30L)) <= 0;
-        symbolMatches = kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("1m");
+        symbolMatches = kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(
+                "1m");
 
-        longSymbolMatches = kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("1m");
+        longSymbolMatches =
+                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("1m");
         Predicate<KdValue> kGreaterThanD = value -> value.getkValue().compareTo(value.getdValue()) >= 0;
 
         Predicate<KdValue> previousKWasLessThanPreviousD = this::previousKLessThanPreviousD;
+
+        pricePredicate = price ->
+                price.subtract(mediator.getLowPrice())
+                        .divide(mediator.getHighPrice().subtract(mediator.getLowPrice()), 2, RoundingMode.HALF_EVEN)
+                        .compareTo(valueOf(0.70D)) < 0;
 
         activatePredicate = kGreaterThanPreviousK
                 .and(previousKWasLessThanPreviousD)
@@ -100,8 +109,12 @@ public class BuyStrategy implements KdTradingStrategy {
     public boolean canPlaceOrder(final Order order) {
 
         final boolean canAfford = affordPredicate.test(order);
-        return STRATEGY_NAME.equals(order.getStrategy()) && order.getSide().equals(Order.OrderSide.BUY) && canPlaceABuy
-                && canAfford;
+        final boolean priceTest = pricePredicate.test(order.getPrice());
+        return STRATEGY_NAME.equals(order.getStrategy())
+                && order.getSide().equals(Order.OrderSide.BUY)
+                && canPlaceABuy
+                && canAfford
+                && priceTest;
     }
 
     @Override
