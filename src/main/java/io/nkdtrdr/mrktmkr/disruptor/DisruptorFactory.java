@@ -24,6 +24,7 @@ import io.nkdtrdr.mrktmkr.persistence.processors.PersistedOrderFilledProcessor;
 import io.nkdtrdr.mrktmkr.persistence.processors.PersistenceOrderRequestedHandler;
 import io.nkdtrdr.mrktmkr.strategy.processors.InitialOrderCancelledEventProcessor;
 import io.nkdtrdr.mrktmkr.strategy.processors.StrategyEventProcessor;
+import io.nkdtrdr.mrktmkr.strategy.processors.SymbolStatsUpdatedProcessor;
 import io.nkdtrdr.mrktmkr.triggers.processors.OrderUpdateEventProcessor;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
@@ -73,7 +74,8 @@ public class DisruptorFactory {
                                               CancelOrderEventProcessor cancelOrderEventProcessor,
                                               OrderUpdateEventProcessor orderUpdateEventProcessor,
                                               PersistedOrderFilledProcessor persistedOrderFilledProcessor,
-                                              PersistenceOrderRequestedHandler persistenceOrderRequestedHandler
+                                              PersistenceOrderRequestedHandler persistenceOrderRequestedHandler,
+                                              SymbolStatsUpdatedProcessor symbolStatsUpdatedProcessor
     ) {
         Disruptor<MakerEvent> disruptor =
                 new Disruptor<>(
@@ -81,7 +83,7 @@ public class DisruptorFactory {
                         RING_BUFFER_SIZE,
                         DaemonThreadFactory.INSTANCE);
         disruptor
-                .handleEventsWith(loggerHandler)
+                .handleEventsWith(loggerHandler, getHasThrownEventHandler(symbolStatsUpdatedProcessor))
                 .then(
                         getHasThrownEventHandler(accountReceivedProcessor),
                         getHasThrownEventHandler(accountUpdatedProcessor))

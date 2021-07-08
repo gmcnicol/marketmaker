@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ActivationTracker {
-    private static final int MINIMUM_ACTIVATION_COUNT = 2;
+    private static final int MINIMUM_ACTIVATION_COUNT = 1;
     private String candidateStrategy;
     private int activationCount;
 
