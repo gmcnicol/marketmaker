@@ -77,7 +77,7 @@ public class SellStrategy implements KdTradingStrategy {
         pricePredicate = price ->
                 price.subtract(mediator.getLowPrice())
                         .divide(mediator.getHighPrice().subtract(mediator.getLowPrice()), 2, RoundingMode.HALF_EVEN)
-                        .compareTo(valueOf(0.30D)) > 0;
+                        .compareTo(valueOf(0.75D)) > 0;
         this.canAffordPredicate = o -> o.getValue().compareTo(valueOf(10.10D)) >= 0;
     }
 

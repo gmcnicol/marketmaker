@@ -54,7 +54,7 @@ public class TriggersMediator {
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.CEILING);
 
-            BigDecimal margin = valueOf(0.99995);
+            BigDecimal margin = valueOf(0.999);
             BigDecimal newValue = netValue.multiply(margin);
             BigDecimal newPrice = newValue.divide(grossQuantity, symbol.getQuoteScale(), RoundingMode.FLOOR);
 
@@ -66,20 +66,6 @@ public class TriggersMediator {
             orderBuilder.setSide(Order.OrderSide.BUY);
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
-
-//            margin = valueOf(1.012);
-//            newPrice = new BigDecimal(orderStrings.originalPrice).multiply(margin);
-//
-//            orderBuilder = Order.newBuilder(order);
-//            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
-//            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-//            orderBuilder.setPrice(newPrice);
-//            orderBuilder.setQuantity(grossQuantity);
-//            orderBuilder.setSide(Order.OrderSide.BUY);
-//            orderBuilder.setOrderId(orderId);
-//
-//            final Order bailOrder = orderBuilder.build();
-//            return Set.of(targetOrder, bailOrder);
             return Set.of(targetOrder);
         }
         return Set.of();
@@ -98,7 +84,7 @@ public class TriggersMediator {
                             RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
-            BigDecimal margin = valueOf(1.00005);
+            BigDecimal margin = valueOf(1.001);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
             BigDecimal price = adjustedValue.divide(netQuantity, symbol.getQuoteScale(), RoundingMode.CEILING);
@@ -113,17 +99,7 @@ public class TriggersMediator {
             orderBuilder.setOrderId(orderId);
             final Order targetOrder = orderBuilder.build();
 
-//            margin = valueOf(0.988);
-//            price = new BigDecimal(orderStrings.originalPrice).multiply(margin);
-//            orderBuilder = Order.newBuilder(order);
-//            orderBuilder.setTriggerDirection(Order.TriggerDirection.BAIL_OUT);
-//            orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-//            orderBuilder.setPrice(price);
-//            orderBuilder.setQuantity(netQuantity);
-//            orderBuilder.setSide(Order.OrderSide.SELL);
-//            orderBuilder.setOrderId(orderId);
-//            final Order bailOrder = orderBuilder.build();
-            return Set.of(targetOrder);//, bailOrder);
+            return Set.of(targetOrder);
         }
         return Set.of();
     }
