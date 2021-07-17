@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
 public class KDValueUpdatedProcessor implements EventProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(KDValueUpdatedProcessor.class);
@@ -28,6 +29,5 @@ public class KDValueUpdatedProcessor implements EventProcessor {
     @Override
     public void process(MakerEvent makerEvent, Consumer<EventEnvelope> resultHandler) {
         strategyFacade.processKDValue((KdValue) makerEvent.getEventEnvelope().getPayload(), resultHandler);
-
     }
 }

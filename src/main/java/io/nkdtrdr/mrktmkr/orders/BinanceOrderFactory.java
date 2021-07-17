@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import static com.binance.api.client.domain.TimeInForce.GTC;
 
+
 public final class BinanceOrderFactory {
     private BinanceOrderFactory() {
 

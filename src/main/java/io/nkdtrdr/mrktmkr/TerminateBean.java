@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 
+
 @Service
 public class TerminateBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(TerminateBean.class);

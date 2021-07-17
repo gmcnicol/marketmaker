@@ -5,6 +5,7 @@ import io.nkdtrdr.mrktmkr.dto.CandleStickDTO;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+
 public class StochasticPeriod {
     private static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
     private static final int SCALE = 8;

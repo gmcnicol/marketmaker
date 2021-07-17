@@ -11,6 +11,7 @@ import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.FLOOR;
 import static java.util.Comparator.naturalOrder;
 
+
 public class StochasticKDCalculators {
     public static BigDecimal getKValue(Collection<StochasticPeriod> values, BigDecimal currentClose) {
         final BigDecimal low = getLowFromValues(values);
@@ -42,5 +43,4 @@ public class StochasticKDCalculators {
                 .reduce(ZERO, BigDecimal::add)
                 .divide(dDivisor, 8, FLOOR);
     }
-
 }

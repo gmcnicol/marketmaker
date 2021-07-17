@@ -3,10 +3,8 @@ package io.nkdtrdr.mrktmkr;
 import com.binance.api.client.domain.account.Account;
 import com.binance.api.client.domain.account.NewOrder;
 import com.binance.api.client.domain.event.CandlestickEvent;
-import com.binance.api.client.domain.event.DepthEvent;
 import com.binance.api.client.domain.market.Candlestick;
 import com.binance.api.client.domain.market.CandlestickInterval;
-import com.binance.api.client.domain.market.OrderBook;
 import com.binance.api.client.domain.market.TickerStatistics;
 import com.google.common.collect.ImmutableMap;
 import com.lmax.disruptor.EventTranslatorTwoArg;
@@ -81,7 +79,6 @@ public class ProcessMediator {
 
         this.websocketAdapter = websocketAdapter;
         this.websocketAdapter.setProcessMediator(this);
-
     }
 
     public void start() {
@@ -90,7 +87,6 @@ public class ProcessMediator {
         restClient.getSymbolStats(symbol);
         restClient.startUserStream();
         restClient.getAccount();
-        //restClient.getCandleStick(symbol.getSymbol().toUpperCase(Locale.ROOT), CandlestickInterval.FIVE_MINUTES);
         restClient.getCandleStick(symbol.getSymbol().toUpperCase(), CandlestickInterval.ONE_MINUTE);
     }
 

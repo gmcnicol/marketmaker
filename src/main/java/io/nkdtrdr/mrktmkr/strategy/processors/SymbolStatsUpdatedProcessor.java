@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
 public class SymbolStatsUpdatedProcessor implements EventProcessor {
     private final StrategyFacade strategyFacade;

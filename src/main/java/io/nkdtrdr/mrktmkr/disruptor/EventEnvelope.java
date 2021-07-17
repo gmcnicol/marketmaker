@@ -2,6 +2,7 @@ package io.nkdtrdr.mrktmkr.disruptor;
 
 import com.google.common.base.MoreObjects;
 
+
 public class EventEnvelope {
     private String eventName;
     private Object payload;

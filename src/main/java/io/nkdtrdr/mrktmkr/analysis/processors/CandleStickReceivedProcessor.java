@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import static io.nkdtrdr.mrktmkr.disruptor.EventEnvelope.EventEnvelopeBuilder.anEventEnvelope;
 
+
 @Component
 public class CandleStickReceivedProcessor implements EventProcessor {
     private final AnalysisMediator mediator;

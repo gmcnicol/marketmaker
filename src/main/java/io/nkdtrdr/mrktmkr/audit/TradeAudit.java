@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 
 import static java.nio.file.StandardOpenOption.*;
 
+
 @Component
 public class TradeAudit {
 

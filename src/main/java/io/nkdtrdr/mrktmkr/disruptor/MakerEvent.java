@@ -4,11 +4,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+
 public class MakerEvent {
+    private final ConcurrentLinkedQueue<EventEnvelope> results = new ConcurrentLinkedQueue<>();
     private String eventName;
     private Throwable throwable;
     private EventEnvelope eventEnvelope;
-    private final ConcurrentLinkedQueue<EventEnvelope> results = new ConcurrentLinkedQueue<>();
 
     public String getEventName() {
         return eventName;

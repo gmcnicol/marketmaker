@@ -3,6 +3,7 @@ package io.nkdtrdr.mrktmkr.utilities;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+
 public class BigDecimalUtilities {
     private BigDecimalUtilities() {
 

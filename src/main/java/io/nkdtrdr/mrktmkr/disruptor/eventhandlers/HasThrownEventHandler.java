@@ -3,6 +3,7 @@ package io.nkdtrdr.mrktmkr.disruptor.eventhandlers;
 import com.lmax.disruptor.EventHandler;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 
+
 public class HasThrownEventHandler implements EventHandler<MakerEvent> {
     private final EventHandler<MakerEvent> innerEventHandler;
 

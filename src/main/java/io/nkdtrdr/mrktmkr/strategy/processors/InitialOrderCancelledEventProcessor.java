@@ -29,7 +29,7 @@ public class InitialOrderCancelledEventProcessor implements EventProcessor {
         final OrderTradeUpdateEvent orderTradeUpdateEvent =
                 (OrderTradeUpdateEvent) makerEvent.getEventEnvelope().getPayload();
         final OrderStatus orderStatus = orderTradeUpdateEvent.getOrderStatus();
-        if (orderStatus.equals(OrderStatus.CANCELED)){
+        if (orderStatus.equals(OrderStatus.CANCELED)) {
             strategyFacade.setLocked(false);
             strategyFacade.placeInitialOrder();
         }

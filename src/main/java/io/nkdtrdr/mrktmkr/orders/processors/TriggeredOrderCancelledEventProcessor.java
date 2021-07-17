@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
 public class TriggeredOrderCancelledEventProcessor implements EventProcessor {
     private final OrdersFacade ordersFacade;

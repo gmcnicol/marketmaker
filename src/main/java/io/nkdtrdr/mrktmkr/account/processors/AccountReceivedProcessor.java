@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
 public class AccountReceivedProcessor implements EventProcessor {
     private final AccountFacade accountFacade;

@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+
 @Component
 public class TradingStrategyRepository<T> {
 

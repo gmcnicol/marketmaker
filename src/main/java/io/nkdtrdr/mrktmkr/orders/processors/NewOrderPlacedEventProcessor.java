@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 
 import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
 
+
 @Component
 public class NewOrderPlacedEventProcessor implements EventProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(NewOrderPlacedEventProcessor.class);
@@ -43,6 +44,5 @@ public class NewOrderPlacedEventProcessor implements EventProcessor {
                 .build();
 
         ordersFacade.trackOpenOrder(order);
-
     }
 }

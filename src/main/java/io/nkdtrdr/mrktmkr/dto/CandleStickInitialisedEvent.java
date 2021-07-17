@@ -2,6 +2,7 @@ package io.nkdtrdr.mrktmkr.dto;
 
 import java.util.Collection;
 
+
 public class CandleStickInitialisedEvent {
     private Collection<CandleStickDTO> candleStickDTOS;
     private String symbol;

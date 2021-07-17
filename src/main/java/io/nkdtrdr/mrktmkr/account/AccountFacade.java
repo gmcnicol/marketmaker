@@ -7,13 +7,10 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static io.nkdtrdr.mrktmkr.utilities.OrderCalculations.aCalculator;
-import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.valueOf;
 
 

@@ -1,19 +1,14 @@
 package io.nkdtrdr.mrktmkr.orders.processors;
 
-import com.binance.api.client.domain.OrderSide;
 import com.binance.api.client.domain.OrderStatus;
 import com.binance.api.client.domain.event.OrderTradeUpdateEvent;
 import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
-import io.nkdtrdr.mrktmkr.dto.Order;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
-
-import static io.nkdtrdr.mrktmkr.dto.Order.newBuilder;
-import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
 
 
 @Component

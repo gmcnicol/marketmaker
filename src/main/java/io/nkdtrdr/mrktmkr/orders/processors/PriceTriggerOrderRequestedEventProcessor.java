@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
 public class PriceTriggerOrderRequestedEventProcessor implements EventProcessor {
     private final OrdersFacade ordersFacade;
@@ -29,5 +30,4 @@ public class PriceTriggerOrderRequestedEventProcessor implements EventProcessor 
         if (order.getOrderTrigger().equals(Order.OrderTrigger.PRICE))
             ordersFacade.addOrderToBeTriggered(order);
     }
-
 }

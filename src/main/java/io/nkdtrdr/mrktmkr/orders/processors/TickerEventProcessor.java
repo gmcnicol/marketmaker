@@ -11,8 +11,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static java.time.LocalDateTime.now;
-
 
 @Component
 public class TickerEventProcessor implements EventProcessor {

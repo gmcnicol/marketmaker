@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
+
 @Component
 public class WebsocketAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebsocketAdapter.class);

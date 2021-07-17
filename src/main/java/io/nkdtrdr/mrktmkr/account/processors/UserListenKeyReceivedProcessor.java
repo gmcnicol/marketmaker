@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+
 @Component
 public class UserListenKeyReceivedProcessor implements EventProcessor {
 

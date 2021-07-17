@@ -6,6 +6,7 @@ import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class PublisherHandler implements EventHandler<MakerEvent> {
 

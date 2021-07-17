@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 
 import java.math.BigDecimal;
 
+
 public class CandleStickDTO {
     private Long openTime;
     private String symbol;

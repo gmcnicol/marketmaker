@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.math.BigDecimal;
 
+
 public class TradeUpdateEvent {
     private String eventType;
     private String newClientOrderId;
