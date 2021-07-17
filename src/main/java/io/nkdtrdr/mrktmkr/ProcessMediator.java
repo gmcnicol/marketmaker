@@ -18,7 +18,6 @@ import io.nkdtrdr.mrktmkr.dto.CandleStickInitialisedEvent;
 import io.nkdtrdr.mrktmkr.dto.Order;
 import io.nkdtrdr.mrktmkr.dto.SymbolStats;
 import io.nkdtrdr.mrktmkr.monitoring.Monitor;
-import io.nkdtrdr.mrktmkr.orderbook.OrderBookRepository;
 import io.nkdtrdr.mrktmkr.orders.BinanceOrderFactory;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
 import io.nkdtrdr.mrktmkr.persistence.PersistenceFacade;
@@ -57,7 +56,6 @@ public class ProcessMediator {
     };
     private final RestClientAdapter restClient;
     private final WebsocketAdapter websocketAdapter;
-    private final OrderBookRepository orderBookRepository;
     private final ModelMapper modelMapper;
     private final PersistenceFacade persistenceFacade;
     private final OrdersFacade ordersFacade;
@@ -68,7 +66,6 @@ public class ProcessMediator {
 
     public ProcessMediator(RestClientAdapter restClient,
                            WebsocketAdapter websocketAdapter,
-                           OrderBookRepository orderBookRepository,
                            ModelMapper modelMapper,
                            final PersistenceFacade persistenceFacade,
                            @Lazy OrdersFacade ordersFacade,
@@ -85,8 +82,6 @@ public class ProcessMediator {
         this.websocketAdapter = websocketAdapter;
         this.websocketAdapter.setProcessMediator(this);
 
-        this.orderBookRepository = orderBookRepository;
-        this.orderBookRepository.setProcessMediator(this);
     }
 
     public void start() {
@@ -104,19 +99,6 @@ public class ProcessMediator {
         LOGGER.info("Stopping");
         restClient.cancelAllOrders(symbol.getSymbol());
         websocketAdapter.stop();
-    }
-
-    public void getOrderBookForSymbol(String symbol) {
-        restClient.getOrderBook(symbol, 10);
-    }
-
-    public void processDepthEvent(String symbol, DepthEvent payload) {
-        orderBookRepository
-                .getForSymbol(symbol).processDepthEvent(payload);
-    }
-
-    public void setOrderBook(String symbol, OrderBook orderBook) {
-        orderBookRepository.getForSymbol(symbol).setOrderBook(orderBook);
     }
 
     public void setDisruptor(Disruptor<MakerEvent> disruptor) {
