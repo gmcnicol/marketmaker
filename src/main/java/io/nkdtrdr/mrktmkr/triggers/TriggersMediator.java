@@ -54,7 +54,7 @@ public class TriggersMediator {
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.CEILING);
 
-            BigDecimal margin = valueOf(0.999);
+            BigDecimal margin = valueOf(0.9999);
             BigDecimal newValue = netValue.multiply(margin);
             BigDecimal newPrice = newValue.divide(grossQuantity, symbol.getQuoteScale(), RoundingMode.FLOOR);
 
@@ -74,7 +74,6 @@ public class TriggersMediator {
     private Set<Order> getFollowupSales(final Order order) {
         if (order.getSide().equals(Order.OrderSide.BUY)) {
             final OrderStrings orderStrings = OrderStrings.fromOrder(order);
-
             order.setStrategy("BUY");
             final BigDecimal buyCommission =
                     ONE.subtract(getBuyCommission()).setScale(symbol.getQuoteScale(), RoundingMode.FLOOR);
@@ -84,7 +83,7 @@ public class TriggersMediator {
                             RoundingMode.FLOOR);
 
             final BigDecimal saleCommission = ONE.add(getSaleCommission());
-            BigDecimal margin = valueOf(1.001);
+            BigDecimal margin = valueOf(1.0001);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
             BigDecimal price = adjustedValue.divide(netQuantity, symbol.getQuoteScale(), RoundingMode.CEILING);
@@ -112,25 +111,18 @@ public class TriggersMediator {
         return accountFacade.getBuyCommission();
     }
 
-    public BigDecimal getFreeBalanceForAsset(String asset) {
-        return accountFacade.getFreeBalanceForAsset(asset);
-    }
-
     private static class OrderStrings {
         private final String originalValue;
-        private final String originalPrice;
         private final String originalQuantity;
 
-        private OrderStrings(final String originalValue, final String originalPrice, final String originalQuantity) {
+        private OrderStrings(final String originalValue, final String originalQuantity) {
             this.originalValue = originalValue;
-            this.originalPrice = originalPrice;
             this.originalQuantity = originalQuantity;
         }
 
         private static OrderStrings fromOrder(Order order) {
             return new OrderStrings(
                     order.getValue().toString(),
-                    order.getPrice().toString(),
                     order.getQuantity().toString());
         }
     }
