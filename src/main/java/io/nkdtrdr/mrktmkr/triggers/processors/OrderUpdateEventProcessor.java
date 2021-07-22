@@ -3,6 +3,7 @@ package io.nkdtrdr.mrktmkr.triggers.processors;
 import com.binance.api.client.domain.OrderSide;
 import com.binance.api.client.domain.OrderStatus;
 import com.binance.api.client.domain.event.OrderTradeUpdateEvent;
+import com.google.common.collect.ImmutableList;
 import io.nkdtrdr.mrktmkr.audit.TradeAudit;
 import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
@@ -24,6 +25,7 @@ public class OrderUpdateEventProcessor implements EventProcessor {
     private final TradeAudit tradeAudit;
     private final TriggersFacade triggersFacade;
     private final Symbol symbol;
+    private static final ImmutableList<String> PREFIXES = ImmutableList.of("OSELL", "OBUY");
 
     public OrderUpdateEventProcessor(TradeAudit tradeAudit, TriggersFacade triggersFacade, final Symbol symbol) {
         this.tradeAudit = tradeAudit;
@@ -45,7 +47,10 @@ public class OrderUpdateEventProcessor implements EventProcessor {
         if (shouldProcess) {
             triggersFacade.setLocked(false);
             tradeAudit.auditOrder(event);
-            if (event.getNewClientOrderId().startsWith("F")) return;
+
+            if (PREFIXES.stream().noneMatch(prefix -> event.getNewClientOrderId().startsWith(prefix))) {
+                return;
+            }
             final Order order = Order.newBuilder()
                     .setSymbol(symbol.getSymbol())
                     .setOrderId(event.getNewClientOrderId())

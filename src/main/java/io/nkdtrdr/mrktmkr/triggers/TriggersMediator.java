@@ -75,8 +75,9 @@ public class TriggersMediator {
         if (order.getSide().equals(Order.OrderSide.BUY)) {
             final OrderStrings orderStrings = OrderStrings.fromOrder(order);
             order.setStrategy("BUY");
+            final Integer quoteScale = symbol.getQuoteScale();
             final BigDecimal buyCommission =
-                    ONE.subtract(getBuyCommission()).setScale(symbol.getQuoteScale(), RoundingMode.FLOOR);
+                    ONE.subtract(getBuyCommission()).setScale(quoteScale, RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
@@ -86,7 +87,7 @@ public class TriggersMediator {
             BigDecimal margin = valueOf(1.0001);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
-            BigDecimal price = adjustedValue.divide(netQuantity, symbol.getQuoteScale(), RoundingMode.CEILING);
+            BigDecimal price = adjustedValue.divide(netQuantity, quoteScale, RoundingMode.CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);

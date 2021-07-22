@@ -63,7 +63,7 @@ public class BuyStrategy implements KdTradingStrategy {
         pricePredicate = price ->
                 price.subtract(mediator.getLowPrice())
                         .divide(mediator.getHighPrice().subtract(mediator.getLowPrice()), 2, RoundingMode.HALF_EVEN)
-                        .compareTo(valueOf(0.5D)) <= 0;
+                        .compareTo(valueOf(0.8D)) <= 0;
 
         activatePredicate = kGreaterThanPreviousK
                 .and(previousKWasLessThanPreviousD)
