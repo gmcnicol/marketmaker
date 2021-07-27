@@ -43,13 +43,13 @@ public class TriggersMediator {
             final OrderStrings orderStrings = OrderStrings.fromOrder(order);
             final String orderId = "FBUY" + formattedDateString(now());
 
-            final BigDecimal saleCommission = ONE.subtract(getSaleCommission());
+            final BigDecimal saleCommission = ONE.subtract(getTakerCommission());
             BigDecimal netValue =
                     new BigDecimal(orderStrings.originalValue)
                             .multiply(saleCommission)
                             .setScale(symbol.getQuoteScale(), RoundingMode.FLOOR);
 
-            final BigDecimal buyCommission = ONE.add(getBuyCommission());
+            final BigDecimal buyCommission = ONE.add(getTakerCommission());
             final BigDecimal grossQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.CEILING);
@@ -77,13 +77,13 @@ public class TriggersMediator {
             order.setStrategy("BUY");
             final Integer quoteScale = symbol.getQuoteScale();
             final BigDecimal buyCommission =
-                    ONE.subtract(getBuyCommission()).setScale(quoteScale, RoundingMode.FLOOR);
+                    ONE.subtract(getTakerCommission()).setScale(quoteScale, RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.FLOOR);
 
-            final BigDecimal saleCommission = ONE.add(getSaleCommission());
+            final BigDecimal saleCommission = ONE.add(getTakerCommission());
             BigDecimal margin = valueOf(1.0001);
             BigDecimal adjustedValue =
                     new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
@@ -104,12 +104,8 @@ public class TriggersMediator {
         return Set.of();
     }
 
-    private BigDecimal getSaleCommission() {
-        return accountFacade.getSaleCommission();
-    }
-
-    private BigDecimal getBuyCommission() {
-        return accountFacade.getBuyCommission();
+    private BigDecimal getTakerCommission() {
+        return accountFacade.getTakerCommission();
     }
 
     private static class OrderStrings {
