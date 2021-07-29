@@ -32,8 +32,8 @@ binance:
 strategy:
   limits:
     - strategy: BUY
-      asset: GBP
-      asset-cap: 35
+      asset: BTC
+      asset-cap: 0.001
     - strategy: SELL
       asset: BTC
       asset-cap: 0.001

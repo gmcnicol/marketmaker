@@ -64,18 +64,24 @@ public class StrategyMediator {
     public void placeInitialOrder() {
         Order initialOrder = activeTradingStrategy.getInitialOrder();
         if (initialOrder.getSide().equals(Order.OrderSide.BUY)) {
+            final BigDecimal price = getBestAskPrice().add(symbol.getOrderPriceAdjustment());
             final Limit limitForAssetAndStrategy =
                     limitsRepository.getLimitForAssetAndStrategy(symbol.getQuoteSymbol(), initialOrder.getStrategy());
 
-            final BigDecimal gbp =
-                    limitForAssetAndStrategy == null
-                            ? accountFacade.getFreeBalanceForAsset(symbol.getQuoteSymbol())
-                            : limitForAssetAndStrategy.getAssetCap();
-
-            final BigDecimal price = getBestAskPrice().add(symbol.getOrderPriceAdjustment());
-            final BigDecimal quantity = gbp.divide(price, symbol.getBaseScale(), RoundingMode.FLOOR);
+            if (limitForAssetAndStrategy != null) {
+                if (symbol.getQuoteSymbol().equals(limitForAssetAndStrategy.getAsset())) {
+                    final BigDecimal gbp = limitForAssetAndStrategy.getAssetCap();
+                    final BigDecimal quantity = gbp.divide(price, symbol.getBaseScale(), RoundingMode.FLOOR);
+                    initialOrder.setQuantity(quantity);
+                } else if (symbol.getBaseSymbol().equals(limitForAssetAndStrategy.getAsset())) {
+                    initialOrder.setQuantity(limitForAssetAndStrategy.getAssetCap());
+                }
+            } else {
+                final BigDecimal gbp = accountFacade.getFreeBalanceForAsset(symbol.getQuoteSymbol());
+                final BigDecimal quantity = gbp.divide(price, symbol.getBaseScale(), RoundingMode.FLOOR);
+                initialOrder.setQuantity(quantity);
+            }
             initialOrder.setPrice(price);
-            initialOrder.setQuantity(quantity);
         }
 
         if (initialOrder.getSide().equals(Order.OrderSide.SELL)) {
