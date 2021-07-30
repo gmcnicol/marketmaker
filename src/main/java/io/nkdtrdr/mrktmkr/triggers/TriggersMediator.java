@@ -14,6 +14,7 @@ import java.util.Set;
 import static io.nkdtrdr.mrktmkr.utilities.DateUtils.formattedDateString;
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.valueOf;
+import static java.math.RoundingMode.CEILING;
 import static java.time.LocalDateTime.now;
 
 
@@ -43,16 +44,16 @@ public class TriggersMediator {
             final OrderStrings orderStrings = OrderStrings.fromOrder(order);
             final String orderId = "FBUY" + formattedDateString(now());
 
-            final BigDecimal saleCommission = ONE.subtract(getTakerCommission());
+            final BigDecimal saleCommission = ONE.subtract(getMakerCommission());
             BigDecimal netValue =
                     new BigDecimal(orderStrings.originalValue)
                             .multiply(saleCommission)
                             .setScale(symbol.getQuoteScale(), RoundingMode.FLOOR);
 
-            final BigDecimal buyCommission = ONE.add(getTakerCommission());
+            final BigDecimal buyCommission = ONE.add(getMakerCommission());
             final BigDecimal grossQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
-                            RoundingMode.CEILING);
+                            CEILING);
 
             BigDecimal margin = valueOf(0.9999);
             BigDecimal newValue = netValue.multiply(margin);
@@ -76,23 +77,23 @@ public class TriggersMediator {
             final OrderStrings orderStrings = OrderStrings.fromOrder(order);
             order.setStrategy("BUY");
             final Integer quoteScale = symbol.getQuoteScale();
-            final BigDecimal buyCommission =
-                    ONE.subtract(getTakerCommission()).setScale(quoteScale, RoundingMode.FLOOR);
+            final BigDecimal makerCommission = getMakerCommission();
+            final BigDecimal grossCommission = ONE.add(makerCommission).setScale(symbol.getBaseScale(), CEILING);
+            final BigDecimal netCommission = ONE.subtract(makerCommission).setScale(quoteScale, RoundingMode.FLOOR);
 
             final BigDecimal netQuantity =
-                    new BigDecimal(orderStrings.originalQuantity).multiply(buyCommission).setScale(symbol.getBaseScale(),
+                    new BigDecimal(orderStrings.originalQuantity).multiply(netCommission).setScale(symbol.getBaseScale(),
                             RoundingMode.FLOOR);
 
-            final BigDecimal saleCommission = ONE.add(getTakerCommission());
-            BigDecimal margin = valueOf(1.0001);
-            BigDecimal adjustedValue =
-                    new BigDecimal(orderStrings.originalValue).multiply(saleCommission).multiply(margin);
-            BigDecimal price = adjustedValue.divide(netQuantity, quoteScale, RoundingMode.CEILING);
+            final BigDecimal margin = valueOf(1.0005);
+            final BigDecimal price = new BigDecimal(orderStrings.originalValue)
+                    .multiply(margin)
+                    .multiply(grossCommission).divide(netQuantity, quoteScale, CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);
             orderBuilder.setOrderTrigger(Order.OrderTrigger.PRICE);
-            orderBuilder.setPrice(new BigDecimal(price.toString()));
+            orderBuilder.setPrice(price);
             orderBuilder.setQuantity(netQuantity);
             orderBuilder.setSide(Order.OrderSide.SELL);
             final String orderId = "FSELL" + formattedDateString(now());
@@ -104,8 +105,8 @@ public class TriggersMediator {
         return Set.of();
     }
 
-    private BigDecimal getTakerCommission() {
-        return accountFacade.getTakerCommission();
+    public BigDecimal getMakerCommission() {
+        return accountFacade.getMakerCommission();
     }
 
     private static class OrderStrings {
