@@ -65,8 +65,7 @@ public class StrategyMediator {
         Order initialOrder = activeTradingStrategy.getInitialOrder();
         if (initialOrder.getSide().equals(Order.OrderSide.BUY)) {
             final BigDecimal price = getBestAskPrice().add(symbol.getOrderPriceAdjustment());
-            final Limit limitForAssetAndStrategy =
-                    limitsRepository.getLimitForAssetAndStrategy(symbol.getQuoteSymbol(), initialOrder.getStrategy());
+            final Limit limitForAssetAndStrategy = getLimitForAssetAndStrategy(initialOrder);
 
             if (limitForAssetAndStrategy != null) {
                 if (symbol.getQuoteSymbol().equals(limitForAssetAndStrategy.getAsset())) {
@@ -102,6 +101,16 @@ public class StrategyMediator {
             initialOrder.setPrice(price);
         }
         placeOrder(initialOrder);
+    }
+
+    private Limit getLimitForAssetAndStrategy(final Order initialOrder) {
+        Limit limitForAssetAndStrategy =
+                limitsRepository.getLimitForAssetAndStrategy(symbol.getQuoteSymbol(), initialOrder.getStrategy());
+
+        limitForAssetAndStrategy = limitForAssetAndStrategy != null
+                ? limitForAssetAndStrategy
+                : limitsRepository.getLimitForAssetAndStrategy(symbol.getBaseSymbol(), initialOrder.getStrategy());
+        return limitForAssetAndStrategy;
     }
 
     public void placeOrder(final Order order) {
