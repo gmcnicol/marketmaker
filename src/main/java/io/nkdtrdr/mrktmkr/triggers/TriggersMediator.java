@@ -83,12 +83,13 @@ public class TriggersMediator {
 
             final BigDecimal netQuantity =
                     new BigDecimal(orderStrings.originalQuantity).multiply(netCommission).setScale(symbol.getBaseScale(),
-                            RoundingMode.FLOOR);
+                            RoundingMode.DOWN);
 
             final BigDecimal margin = valueOf(1.0005);
             final BigDecimal price = new BigDecimal(orderStrings.originalValue)
                     .multiply(margin)
-                    .multiply(grossCommission).divide(netQuantity, quoteScale, CEILING);
+                    .multiply(grossCommission)
+                    .divide(netQuantity, quoteScale, CEILING);
 
             Order.Builder orderBuilder = Order.newBuilder(order);
             orderBuilder.setTriggerDirection(Order.TriggerDirection.INTENDED);
