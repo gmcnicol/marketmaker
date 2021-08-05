@@ -32,4 +32,13 @@ public class TradeAudit {
             e.printStackTrace();
         }
     }
+
+    public void auditStrategy(String strategy) {
+        try {
+            Files.write(Paths.get("logs/strategy"), strategy.getBytes(StandardCharsets.UTF_8),
+                    CREATE, WRITE, TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
