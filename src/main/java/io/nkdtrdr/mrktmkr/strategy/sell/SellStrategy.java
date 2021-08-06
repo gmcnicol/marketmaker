@@ -21,7 +21,8 @@ import static java.time.LocalDateTime.now;
 
 @Component
 public class SellStrategy implements KdTradingStrategy {
-    public static final BigDecimal THIRTY = valueOf(30L);
+    private static final BigDecimal THIRTY = valueOf(30L);
+    private static final String INTERVAL = "5m";
     private static final BigDecimal EIGHTY = getBigDecimal("80");
     private static final BigDecimal TWENTY = getBigDecimal("20");
     private static final String STRATEGY_NAME = "SELL";
@@ -51,10 +52,10 @@ public class SellStrategy implements KdTradingStrategy {
 
         shortTermSymbolMatches =
                 kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(
-                        "1m");
+                        INTERVAL);
 
         longSymbolMatches =
-                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("5m");
+                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(INTERVAL);
 
         Predicate<KdValue> lastKGreaterThanLastD = this::previousKGreaterThanPreviousD;
 

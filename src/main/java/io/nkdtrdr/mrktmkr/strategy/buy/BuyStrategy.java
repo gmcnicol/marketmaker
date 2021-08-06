@@ -25,6 +25,7 @@ public class BuyStrategy implements KdTradingStrategy {
     private static final String STRATEGY_NAME = "BUY";
     private static final BigDecimal TWENTY = getBigDecimal("20");
     private static final BigDecimal EIGHTY = getBigDecimal("80");
+    public static final String INTERVAL = "5m";
     private final Predicate<KdValue> activatePredicate;
     private final Predicate<KdValue> canPlaceOrderPredicate;
     private final Predicate<Order> affordPredicate;
@@ -52,10 +53,10 @@ public class BuyStrategy implements KdTradingStrategy {
 
         Predicate<KdValue> dLessThanThirty = kdValue -> kdValue.getdValue().compareTo(valueOf(30L)) <= 0;
         symbolMatches = kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(
-                "1m");
+                INTERVAL);
 
         longSymbolMatches =
-                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("5m");
+                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(INTERVAL);
         Predicate<KdValue> kGreaterThanD = value -> value.getkValue().compareTo(value.getdValue()) >= 0;
 
         Predicate<KdValue> previousKWasLessThanPreviousD = this::previousKLessThanPreviousD;
