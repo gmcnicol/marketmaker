@@ -87,7 +87,7 @@ public class ProcessMediator {
         restClient.getSymbolStats(symbol);
         restClient.startUserStream();
         restClient.getAccount();
-        restClient.getCandleStick(symbol.getSymbol().toUpperCase(), CandlestickInterval.ONE_MINUTE);
+        restClient.getCandleStick(symbol.getSymbol().toUpperCase(), CandlestickInterval.FIVE_MINUTES);
     }
 
     @PreDestroy

@@ -16,8 +16,8 @@ public class TriggersFacade {
     private final TriggersMediator triggersMediator;
     private final StrategyFacade strategyFacade;
 
-    public TriggersFacade(TriggersMediator triggersMediator, @
-            Lazy final StrategyFacade strategyFacade) {
+    public TriggersFacade(TriggersMediator triggersMediator,
+                          @Lazy final StrategyFacade strategyFacade) {
         this.triggersMediator = triggersMediator;
         this.strategyFacade = strategyFacade;
     }

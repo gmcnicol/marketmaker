@@ -55,7 +55,7 @@ public class BuyStrategy implements KdTradingStrategy {
                 "1m");
 
         longSymbolMatches =
-                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("1m");
+                kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals("5m");
         Predicate<KdValue> kGreaterThanD = value -> value.getkValue().compareTo(value.getdValue()) >= 0;
 
         Predicate<KdValue> previousKWasLessThanPreviousD = this::previousKLessThanPreviousD;

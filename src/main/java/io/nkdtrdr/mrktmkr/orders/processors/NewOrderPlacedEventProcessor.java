@@ -18,7 +18,6 @@ import static io.nkdtrdr.mrktmkr.utilities.BigDecimalUtilities.getBigDecimal;
 
 @Component
 public class NewOrderPlacedEventProcessor implements EventProcessor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewOrderPlacedEventProcessor.class);
 
     private final OrdersFacade ordersFacade;
 

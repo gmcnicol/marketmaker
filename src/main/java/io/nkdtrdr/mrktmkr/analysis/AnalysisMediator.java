@@ -18,7 +18,6 @@ import static io.nkdtrdr.mrktmkr.disruptor.EventEnvelope.EventEnvelopeBuilder.an
 public class AnalysisMediator {
     private final ProcessMediator processMediator;
     private final AnalyserManager analyserManager;
-    private final CircularFifoQueue<KdValue> lastTwoValues = new CircularFifoQueue<>(2);
 
     public AnalysisMediator(ProcessMediator processMediator, AnalyserManager analyserManager) {
         this.processMediator = processMediator;
