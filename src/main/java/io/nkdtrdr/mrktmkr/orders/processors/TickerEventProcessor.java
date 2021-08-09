@@ -5,6 +5,7 @@ import io.nkdtrdr.mrktmkr.disruptor.EventEnvelope;
 import io.nkdtrdr.mrktmkr.disruptor.EventProcessor;
 import io.nkdtrdr.mrktmkr.disruptor.MakerEvent;
 import io.nkdtrdr.mrktmkr.orders.OrdersFacade;
+import io.nkdtrdr.mrktmkr.strategy.StrategyFacade;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -16,9 +17,11 @@ import java.util.function.Consumer;
 public class TickerEventProcessor implements EventProcessor {
 
     private final OrdersFacade ordersFacade;
+    private final StrategyFacade strategyFacade;
 
-    public TickerEventProcessor(OrdersFacade ordersFacade) {
+    public TickerEventProcessor(OrdersFacade ordersFacade, final StrategyFacade strategyFacade) {
         this.ordersFacade = ordersFacade;
+        this.strategyFacade = strategyFacade;
     }
 
     @Override
@@ -35,5 +38,6 @@ public class TickerEventProcessor implements EventProcessor {
         ordersFacade.setBestAskPrice(tickersEvent.getBestAskPrice(), resultHandler);
         ordersFacade.setBestBidPrice(tickersEvent.getBestBidPrice(), resultHandler);
         ordersFacade.setLastTickerUpdate(Instant.now().toEpochMilli());
+        strategyFacade.placeInitialOrder();
     }
 }
