@@ -23,6 +23,8 @@ import static java.time.LocalDateTime.now;
 public class SellStrategy implements KdTradingStrategy {
     private static final BigDecimal THIRTY = valueOf(30L);
     private static final String INTERVAL = "5m";
+    private static final String SHORT_INTERVAL = "1m";
+
     private static final BigDecimal EIGHTY = getBigDecimal("80");
     private static final BigDecimal TWENTY = getBigDecimal("20");
     private static final String STRATEGY_NAME = "SELL";
@@ -52,7 +54,7 @@ public class SellStrategy implements KdTradingStrategy {
 
         shortTermSymbolMatches =
                 kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(
-                        INTERVAL);
+                        SHORT_INTERVAL);
 
         longSymbolMatches =
                 kdValue -> kdValue.getSymbol().equals(mediator.getSymbol()) && kdValue.getInterval().equals(INTERVAL);
